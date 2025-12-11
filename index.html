@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  ...</title>
+    <title>নুসাইবা আপুর জন্য...</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
         
@@ -13,7 +13,7 @@
             font-family: 'Hind Siliguri', sans-serif;
         }
 
-        /* ---  :    --- */
+        /* --- ধাপ ১: প্রাথমিক লোডিং স্ক্রিন --- */
         #loading-screen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -28,7 +28,7 @@
 
         @keyframes load { to { width: 100%; } }
 
-        /* ---  :    --- */
+        /* --- ধাপ ২: প্রশ্ন করার স্ক্রিন --- */
         #question-screen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -45,7 +45,7 @@
         }
         .answer-btn:hover { background: #ffde59; color: #111; }
         
-        /* ---  :    --- */
+        /* --- ধাপ ৩: মূল সারপ্রাইজ কনটেন্ট --- */
         #main-content {
             display: none; justify-content: center; align-items: center;
             min-height: 100vh;
@@ -79,27 +79,27 @@
         }
         .custom-button:hover { transform: translateY(-5px); }
 
-        /* <<-- :        -->> */
+        /* <<-- নতুন: চূড়ান্ত উপহার এবং লাভের জন্য বিশেষ স্টাইল -->> */
         .final-gift {
-            font-size: 8rem; /*      */
+            font-size: 8rem; /* উপহারের বাক্স বড় করা হয়েছে */
             cursor: pointer;
             animation: wiggle 2s linear infinite;
             display: inline-block;
         }
         .final-heart {
-            font-size: 9rem; /*     */
+            font-size: 9rem; /* লাভ বড় করা হয়েছে */
             color: #ff4757;
-            display: none; /*    */
-            animation: floatUpDown 2s ease-in-out infinite; /* -  */
+            display: none; /* শুরুতে লুকানো থাকবে */
+            animation: floatUpDown 2s ease-in-out infinite; /* আপ-ডাউন অ্যানিমেশন */
         }
 
-        /* ---  --- */
+        /* --- অ্যানিমেশন --- */
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         @keyframes wiggle { 0%, 7% { transform: rotateZ(0); } 15% { transform: rotateZ(-15deg); } 20% { transform: rotateZ(10deg); } 25% { transform: rotateZ(-10deg); } 30% { transform: rotateZ(6deg); } 35% { transform: rotateZ(-4deg); } 40%, 100% { transform: rotateZ(0); } }
         
-        /* <<-- :  -  -->> */
+        /* <<-- নতুন: লাভের আপ-ডাউন অ্যানিমেশন -->> */
         @keyframes floatUpDown {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
@@ -111,27 +111,27 @@
 </head>
 <body>
 
-    <div id="loading-screen"> <p>      ...</p> <div class="progress-bar"><div class="progress"></div></div> </div>
-    <div id="question-screen"> <h2>         ?</h2> <div> <button class="answer-btn" onclick="revealSurprise()"></button> <button class="answer-btn" onclick="revealSurprise()"></button> </div> </div>
+    <div id="loading-screen"> <p>তোমার জন্য একটি বিশেষ বার্তা লোড হচ্ছে...</p> <div class="progress-bar"><div class="progress"></div></div> </div>
+    <div id="question-screen"> <h2>আমার উপর কি এখনো মন খারাপ করে আছো নূসাইবা আপু?</h2> <div> <button class="answer-btn" onclick="revealSurprise()">হ্যাঁ</button> <button class="answer-btn" onclick="revealSurprise()">না</button> </div> </div>
 
     <div id="main-content">
         <div class="container">
-            <div class="step active" id="step1"> <h2>      </h2> <p>  ,       !                    </p> <button class="custom-button" onclick="nextStep('step2')"></button> </div>
-            <div class="step" id="step2"> <h1> ,  !</h1> <p class="cake"></p> <p>,               (20.09.2007)     ,       </p> <button class="custom-button" onclick="nextStep('step3')">  ...</button> </div>
-            <div class="step" id="step3"> <h2>  </h2> <p>    ,               </p> <p>     </p> <button class="custom-button" onclick="nextStep('step4')"> ...</button> </div>
+            <div class="step active" id="step1"> <h2>তাহলে এবার আমাকে ক্ষমা করে দাও আপু</h2> <p>কারণ আমি জানি, আমি সবচেয়ে বড় ভুল করে পেলছি ! ভাই হয়ে তার বোনের জন্মদিনের কথাই ভুলে গেছিলাম। আমি এর জন্য মন থেকে অনেক বেশি দুঃখিত এবং লজ্জিত আপু ।</p> <button class="custom-button" onclick="nextStep('step2')">😭আপু😭</button> </div>
+            <div class="step" id="step2"> <h1>শুভ জন্মদিন, নুসাইবা আপু!</h1> <p class="cake">🎂</p> <p>জানি, শুভেচ্ছাটা তিন মাস আগে দেওয়ার কথা ছিল কিন্তু আমি অনেক দেরি করে পেলছি আপু (20.09.2007)। কিন্তু ক্যালেন্ডারের তারিখ ভুলে গেলেও, আমি তোমাকে এক মুহূর্তের জন্যও ভুলিনি আপু।</p> <button class="custom-button" onclick="nextStep('step3')">আরও কিছু কথা...</button> </div>
+            <div class="step" id="step3"> <h2>আমার মনের কথা</h2> <p>তুমি আমার জন্য কতটা স্পেশাল, তা কোনো তারিখ দিয়ে মাপা যায় না আপু। তুমি আমার সবচেয়ে কাছের একজন আপু। </p> <p>আমার ভুলটা প্লিজ ক্ষমা করে দিও।</p> <button class="custom-button" onclick="nextStep('step4')">শেষ কথা...</button> </div>
             
-            <!-- <<--  :      -->> -->
+            <!-- <<-- ধাপ ৪: এখানে মূল পরিবর্তনটি করা হয়েছে -->> -->
             <div class="step" id="step4">
-                <h2> </h2>
-                <p> ,             ,        ...</p>
+                <h2>মুসাইবা আপু</h2>
+                <p>দোয়া করি, তোমার জীবনটা সবসময় সুন্দর থাকুক। আল্লাহ তোমাকে সব বিপদ থেকে রক্ষা করুন। সবশেষে, তোমার জন্য আমার পক্ষ থেকে ছোট্ট একটি উপহার...</p>
                 
-                <!--   -->
-                <div id="finalGiftBox" class="final-gift" onclick="openFinalGift()"></div>
+                <!-- উপহারের বাক্স -->
+                <div id="finalGiftBox" class="final-gift" onclick="openFinalGift()">🎁</div>
                 
-                <!--   -->
-                <div id="revealedHeart" class="final-heart"></div>
+                <!-- লুকানো লাভ -->
+                <div id="revealedHeart" class="final-heart">❤️</div>
                 
-                <p id="giftInstruction" style="font-size: 0.9rem; margin-top: 10px;">( )</p>
+                <p id="giftInstruction" style="font-size: 0.9rem; margin-top: 10px;">(উপহারটি খোলো)</p>
             </div>
         </div>
     </div>
@@ -163,7 +163,7 @@
             window.scrollTo(0, 0);
         }
         
-        // <<--  :     -->>
+        // <<-- নতুন ফাংশন: চূড়ান্ত উপহারটি খোলার জন্য -->>
         function openFinalGift() {
             document.getElementById('finalGiftBox').style.display = 'none';
             document.getElementById('giftInstruction').style.display = 'none';
