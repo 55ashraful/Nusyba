@@ -1,193 +1,587 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>নুসাইবা আপুর জন্য...</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বুড়া বেডী</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{fontFamily:{inter:['Inter','sans-serif'],geist:['Geist','sans-serif']}}}}</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#fff;overflow-x:hidden;-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.splash-active{overflow:hidden}
 
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-        }
+/* ===== SPLASH SCREEN ===== */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0a0a1a;transition:opacity 1s ease,visibility 1s ease}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#splash-canvas{position:absolute;inset:0;z-index:1}
+.splash-content{position:relative;z-index:2;text-align:center}
+.splash-emoji{font-size:clamp(2.5rem,7vw,4.5rem);animation:splashFloat 2s ease-in-out infinite;margin-bottom:1.5rem}
+.splash-name{font-family:'Geist',sans-serif;font-size:clamp(3rem,14vw,9rem);font-weight:900;background:linear-gradient(135deg,#c084fc,#f472b6,#fbbf24,#34d399,#60a5fa,#c084fc);background-size:400% 400%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:splashGrad 3s ease infinite;line-height:1.1;padding:0 1rem;filter:drop-shadow(0 0 30px rgba(168,85,247,.5)) drop-shadow(0 0 60px rgba(236,72,153,.3))}
+.splash-tagline{color:#c084fc;font-size:clamp(.75rem,2vw,1rem);font-weight:700;margin-top:1.5rem;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:splashFadeIn 1s ease forwards .8s}
+.splash-dots{display:flex;gap:10px;margin-top:2rem;justify-content:center;opacity:0;animation:splashFadeIn 1s ease forwards 1.2s}
+.splash-dots span{width:10px;height:10px;border-radius:50%;animation:splashDot 1.4s ease-in-out infinite}
+.splash-dots span:nth-child(1){background:#a855f7}
+.splash-dots span:nth-child(2){background:#ec4899;animation-delay:.2s}
+.splash-dots span:nth-child(3){background:#fbbf24;animation-delay:.4s}
+.splash-dots span:nth-child(4){background:#34d399;animation-delay:.6s}
+.splash-dots span:nth-child(5){background:#60a5fa;animation-delay:.8s}
+@keyframes splashGrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes splashFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.05)}}
+@keyframes splashDot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1.2);opacity:1}}
+@keyframes splashFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-        /* --- ধাপ ১: প্রাথমিক লোডিং স্ক্রিন --- */
-        #loading-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: #111; color: #fff;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 100; transition: opacity 1s;
-        }
-        #loading-screen p { font-size: 1.2rem; margin-bottom: 20px; }
-        .progress-bar { width: 80%; max-width: 300px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
-        .progress { width: 0%; height: 100%; background: #ffde59; animation: load 3s ease-out forwards; }
-
-        @keyframes load { to { width: 100%; } }
-
-        /* --- ধাপ ২: প্রশ্ন করার স্ক্রিন --- */
-        #question-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: #1a1a1a; color: #fff;
-            display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 99; padding: 20px; text-align: center;
-        }
-        #question-screen h2 { font-size: 1.8rem; margin-bottom: 30px; }
-        .answer-btn {
-            padding: 15px 35px; margin: 10px; border: 2px solid #ffde59;
-            background: transparent; color: #ffde59; font-size: 1.2rem;
-            border-radius: 50px; cursor: pointer; transition: all 0.3s;
-        }
-        .answer-btn:hover { background: #ffde59; color: #111; }
-        
-        /* --- ধাপ ৩: মূল সারপ্রাইজ কনটেন্ট --- */
-        #main-content {
-            display: none; justify-content: center; align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            padding: 60px 20px;
-        }
-        .container {
-            max-width: 95%; width: 550px;
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(25px);
-            border-radius: 30px; padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            text-align: center; color: white;
-        }
-        .step { display: none; animation: fadeIn 1s; }
-        .step.active { display: block; }
-
-        h1 { font-size: 3rem; color: #ffde59; text-shadow: 0 0 15px #ffde59; animation: pulse 2s infinite; }
-        h2 { font-size: 1.8rem; margin-bottom: 20px; }
-        p { font-size: 1.15rem; line-height: 1.8; margin-bottom: 30px; }
-        .cake { font-size: 5rem; margin: 20px 0; }
-        
-        .custom-button {
-            padding: 16px 40px; font-size: 1.2rem; font-weight: 700;
-            color: #3b0d4a; background: linear-gradient(45deg, #ffde59, #ffd54f);
-            border: none; border-radius: 50px; cursor: pointer; transition: all 0.4s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); margin-top: 15px;
-        }
-        .custom-button:hover { transform: translateY(-5px); }
-
-        /* <<-- নতুন: চূড়ান্ত উপহার এবং লাভের জন্য বিশেষ স্টাইল -->> */
-        .final-gift {
-            font-size: 8rem; /* উপহারের বাক্স বড় করা হয়েছে */
-            cursor: pointer;
-            animation: wiggle 2s linear infinite;
-            display: inline-block;
-        }
-        .final-heart {
-            font-size: 9rem; /* লাভ বড় করা হয়েছে */
-            color: #ff4757;
-            display: none; /* শুরুতে লুকানো থাকবে */
-            animation: floatUpDown 2s ease-in-out infinite; /* আপ-ডাউন অ্যানিমেশন */
-        }
-
-        /* --- অ্যানিমেশন --- */
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        @keyframes wiggle { 0%, 7% { transform: rotateZ(0); } 15% { transform: rotateZ(-15deg); } 20% { transform: rotateZ(10deg); } 25% { transform: rotateZ(-10deg); } 30% { transform: rotateZ(6deg); } 35% { transform: rotateZ(-4deg); } 40%, 100% { transform: rotateZ(0); } }
-        
-        /* <<-- নতুন: লাভের আপ-ডাউন অ্যানিমেশন -->> */
-        @keyframes floatUpDown {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .confetti { position: fixed; top: -10px; width: 10px; height: 10px; pointer-events: none; opacity: 0.7; z-index: 101; animation: fall linear infinite; }
-        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
-    </style>
+@keyframes floatUp{0%{transform:translateY(100vh) rotate(0deg) scale(.5);opacity:0}10%{opacity:.4}90%{opacity:.1}100%{transform:translateY(-10vh) rotate(360deg) scale(1);opacity:0}}
+.float-emoji{position:fixed;animation:floatUp linear infinite;opacity:0;z-index:0;pointer-events:none}
+@keyframes heartbeat{0%,100%{transform:scale(1)}15%{transform:scale(1.12)}30%{transform:scale(1)}45%{transform:scale(1.06)}60%{transform:scale(1)}}
+.heartbeat{animation:heartbeat 2s ease-in-out infinite}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.ani{opacity:0;animation:fadeInUp .8s ease-out forwards}
+.d1{animation-delay:.15s}.d2{animation-delay:.3s}.d3{animation-delay:.45s}.d4{animation-delay:.6s}.d5{animation-delay:.75s}.d6{animation-delay:.9s}.d7{animation-delay:1.05s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+.scroll-bounce{animation:bounce 2s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+.wiggle{animation:wiggle 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.float-anim{animation:float 3s ease-in-out infinite}
+@keyframes pulseRing{0%{transform:scale(.8);opacity:.6}100%{transform:scale(2.2);opacity:0}}
+.pulse-ring::before,.pulse-ring::after{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid rgba(168,85,247,.4);animation:pulseRing 3s ease-out infinite}
+.pulse-ring::after{animation-delay:1.5s}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.grad-anim{background-size:200% 200%;animation:gradientMove 4s ease infinite}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.dot-typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#c084fc;animation:dotPulse 1.4s ease-in-out infinite;margin:0 2px}
+.dot-typing span:nth-child(2){animation-delay:.2s}
+.dot-typing span:nth-child(3){animation-delay:.4s}
+@keyframes msgPop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.msg-pop{animation:msgPop .4s ease-out forwards}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee{animation:marquee 25s linear infinite}
+@keyframes confettiFall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+.confetti{position:fixed;animation:confettiFall linear forwards;pointer-events:none;z-index:9999}
+@keyframes toastIn{from{transform:translateY(70px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes toastOut{from{transform:translateY(0);opacity:1}to{transform:translateY(70px);opacity:0}}
+.toast-in{animation:toastIn .3s ease-out forwards}
+.toast-out{animation:toastOut .3s ease-in forwards}
+@keyframes nameGlow{0%,100%{text-shadow:0 0 30px rgba(168,85,247,.3)}50%{text-shadow:0 0 60px rgba(168,85,247,.6),0 0 100px rgba(236,72,153,.3)}}
+.name-glow{animation:nameGlow 3s ease-in-out infinite}
+.card{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(236,72,153,.05));border:2px solid rgba(168,85,247,.2);border-radius:16px;transition:all .3s}
+.card:hover{border-color:rgba(168,85,247,.5);box-shadow:0 8px 32px rgba(168,85,247,.15)}
+html{scroll-behavior:smooth}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#0a0a1a}
+::-webkit-scrollbar-thumb{background:linear-gradient(#a855f7,#ec4899);border-radius:3px}
+.sr{opacity:0}
+</style>
 </head>
-<body>
+<body class="font-inter splash-active">
 
-    <div id="loading-screen"> <p>তোমার জন্য একটি বিশেষ বার্তা লোড হচ্ছে...</p> <div class="progress-bar"><div class="progress"></div></div> </div>
-    <div id="question-screen"> <h2>আমার উপর কি এখনো মন খারাপ করে আছো নূসাইবা আপু?</h2> <div> <button class="answer-btn" onclick="revealSurprise()">হ্যাঁ</button> <button class="answer-btn" onclick="revealSurprise()">না</button> </div> </div>
+<script>
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('copy',e=>e.preventDefault());
+document.addEventListener('cut',e=>e.preventDefault());
+document.addEventListener('selectstart',e=>e.preventDefault());
+document.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&['c','u','s','a'].includes(e.key))e.preventDefault();if(e.key==='F12')e.preventDefault()});
+</script>
 
-    <div id="main-content">
-        <div class="container">
-            <div class="step active" id="step1"> <h2>তাহলে এবার আমাকে ক্ষমা করে দাও আপু</h2> <p>কারণ আমি জানি, আমি সবচেয়ে বড় ভুল করে পেলছি ! ভাই হয়ে তার বোনের জন্মদিনের কথাই ভুলে গেছিলাম। আমি এর জন্য মন থেকে অনেক বেশি দুঃখিত এবং লজ্জিত আপু ।</p> <button class="custom-button" onclick="nextStep('step2')">😭আপু😭</button> </div>
-            <div class="step" id="step2"> <h1>শুভ জন্মদিন, নুসাইবা আপু!</h1> <p class="cake">🎂</p> <p>জানি, শুভেচ্ছাটা তিন মাস আগে দেওয়ার কথা ছিল কিন্তু আমি অনেক দেরি করে পেলছি আপু (20.09.2007)। কিন্তু ক্যালেন্ডারের তারিখ ভুলে গেলেও, আমি তোমাকে এক মুহূর্তের জন্যও ভুলিনি আপু।</p> <button class="custom-button" onclick="nextStep('step3')">আরও কিছু কথা...</button> </div>
-            <div class="step" id="step3"> <h2>আমার মনের কথা</h2> <p>তুমি আমার জন্য কতটা স্পেশাল, তা কোনো তারিখ দিয়ে মাপা যায় না আপু। তুমি আমার সবচেয়ে কাছের একজন আপু। </p> <p>আমার ভুলটা প্লিজ ক্ষমা করে দিও।</p> <button class="custom-button" onclick="nextStep('step4')">শেষ কথা...</button> </div>
-            
-            <!-- <<-- ধাপ ৪: এখানে মূল পরিবর্তনটি করা হয়েছে -->> -->
-            <div class="step" id="step4">
-                <h2>নুসাইবা আপু</h2>
-                <p>দোয়া করি, তোমার জীবনটা সবসময় সুন্দর থাকুক। আল্লাহ তোমাকে সব বিপদ থেকে রক্ষা করুন। সবশেষে, তোমার জন্য আমার পক্ষ থেকে ছোট্ট একটি উপহার...</p>
-                
-                <!-- উপহারের বাক্স -->
-                <div id="finalGiftBox" class="final-gift" onclick="openFinalGift()">🎁</div>
-                
-                <!-- লুকানো লাভ -->
-                <div id="revealedHeart" class="final-heart">❤️</div>
-                
-                <p id="giftInstruction" style="font-size: 0.9rem; margin-top: 10px;">(উপহারটি খোলো)</p>
-            </div>
-        </div>
-    </div>
+<!-- ===== SPLASH SCREEN WITH FIREWORKS ===== -->
+<div id="splash">
+<canvas id="splash-canvas"></canvas>
+<div class="splash-content">
+<div class="splash-emoji">🌟</div>
+<div class="splash-name">বুড়া বেডী</div>
+<div class="splash-tagline">✦ আপনি স্পেশাল মানুষ ✦</div>
+<div class="splash-dots"><span></span><span></span><span></span><span></span><span></span></div>
+</div>
+</div>
 
-    <script>
-        const loadingScreen = document.getElementById('loading-screen');
-        const questionScreen = document.getElementById('question-screen');
-        const mainContent = document.getElementById('main-content');
-        
-        window.setTimeout(() => {
-            loadingScreen.style.opacity = '0';
-            questionScreen.style.display = 'flex';
-            window.setTimeout(() => loadingScreen.style.display = 'none', 1000);
-        }, 4000);
+<script>
+// ===== FIREWORK / AATOSHBAZI EFFECT ON SPLASH =====
+(function(){
+const canvas=document.getElementById('splash-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[],fireworks=[];
+const colors=['#a855f7','#ec4899','#fbbf24','#34d399','#60a5fa','#f43f5e','#8b5cf6','#f97316','#06b6d4','#eab308'];
+let animId;
+let startTime=Date.now();
 
-        function revealSurprise() {
-            questionScreen.style.opacity = '0';
-            document.body.style.overflowY = 'auto';
-            mainContent.style.display = 'flex';
-            window.setTimeout(() => questionScreen.style.display = 'none', 1000);
-            setInterval(createConfetti, 100);
-        }
+function resize(){
+W=canvas.width=window.innerWidth;
+H=canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
 
-        let currentStepId = 'step1';
-        function nextStep(stepId) {
-            document.getElementById(currentStepId).classList.remove('active');
-            document.getElementById(stepId).classList.add('active');
-            currentStepId = stepId;
-            window.scrollTo(0, 0);
-        }
-        
-        // <<-- নতুন ফাংশন: চূড়ান্ত উপহারটি খোলার জন্য -->>
-        function openFinalGift() {
-            document.getElementById('finalGiftBox').style.display = 'none';
-            document.getElementById('giftInstruction').style.display = 'none';
-            document.getElementById('revealedHeart').style.display = 'block';
-        }
+// Particle class - sparks that fly out
+class Particle{
+constructor(x,y,color){
+this.x=x;this.y=y;this.color=color;
+const angle=Math.random()*Math.PI*2;
+const speed=Math.random()*6+2;
+this.vx=Math.cos(angle)*speed;
+this.vy=Math.sin(angle)*speed;
+this.alpha=1;
+this.decay=Math.random()*.015+.008;
+this.size=Math.random()*3+1;
+this.gravity=.06;
+this.trail=[];
+}
+update(){
+this.trail.push({x:this.x,y:this.y,alpha:this.alpha});
+if(this.trail.length>6)this.trail.shift();
+this.vx*=.99;this.vy*=.99;
+this.vy+=this.gravity;
+this.x+=this.vx;this.y+=this.vy;
+this.alpha-=this.decay;
+}
+draw(){
+// Draw trail
+for(let i=0;i<this.trail.length;i++){
+const t=this.trail[i];
+ctx.beginPath();
+ctx.arc(t.x,t.y,this.size*(i/this.trail.length),0,Math.PI*2);
+ctx.fillStyle=this.color;
+ctx.globalAlpha=t.alpha*(i/this.trail.length)*.3;
+ctx.fill();
+}
+// Draw particle
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+ctx.fillStyle=this.color;
+ctx.globalAlpha=this.alpha;
+ctx.fill();
+ctx.globalAlpha=1;
+}
+}
 
-        function createConfetti() {
-            const confetti = document.createElement('div');
-            confetti.classList.add('confetti');
-            const colors = ['#ffde59', '#ff69b4', '#00e676', '#7b1fa2', '#29b6f6'];
-            
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDuration = Math.random() * 3 + 4 + 's';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-            
-            document.body.appendChild(confetti);
+// Firework class - rocket that goes up then explodes
+class Firework{
+constructor(){
+this.x=Math.random()*W;
+this.y=H;
+this.targetY=H*.2+Math.random()*H*.4;
+this.speed=Math.random()*4+3;
+this.color=colors[~~(Math.random()*colors.length)];
+this.exploded=false;
+this.trail=[];
+}
+update(){
+if(!this.exploded){
+this.trail.push({x:this.x,y:this.y});
+if(this.trail.length>12)this.trail.shift();
+this.y-=this.speed;
+if(this.y<=this.targetY){
+this.explode();
+}
+}
+}
+explode(){
+this.exploded=true;
+const count=~~(Math.random()*60+40);
+for(let i=0;i<count;i++){
+particles.push(new Particle(this.x,this.y,this.color));
+}
+// Add some different colored sparks
+for(let i=0;i<20;i++){
+particles.push(new Particle(this.x,this.y,colors[~~(Math.random()*colors.length)]));
+}
+}
+draw(){
+if(this.exploded)return;
+// Draw rocket trail
+for(let i=0;i<this.trail.length;i++){
+const t=this.trail[i];
+ctx.beginPath();
+ctx.arc(t.x,t.y,2,0,Math.PI*2);
+ctx.fillStyle=this.color;
+ctx.globalAlpha=i/this.trail.length*.5;
+ctx.fill();
+}
+// Draw rocket head
+ctx.beginPath();
+ctx.arc(this.x,this.y,3,0,Math.PI*2);
+ctx.fillStyle='#fff';
+ctx.globalAlpha=1;
+ctx.fill();
+// Glow around rocket
+ctx.beginPath();
+ctx.arc(this.x,this.y,8,0,Math.PI*2);
+ctx.fillStyle=this.color;
+ctx.globalAlpha=.3;
+ctx.fill();
+ctx.globalAlpha=1;
+}
+}
 
-            setTimeout(() => {
-                confetti.remove();
-            }, 7000);
-        }
-    </script>
+// Ring explosion around name
+class RingBurst{
+constructor(x,y){
+this.x=x;this.y=y;
+this.radius=0;
+this.maxRadius=Math.min(W,H)*.35;
+this.speed=4;
+this.alpha=1;
+this.color=colors[~~(Math.random()*colors.length)];
+}
+update(){
+this.radius+=this.speed;
+this.alpha=1-(this.radius/this.maxRadius);
+}
+draw(){
+if(this.alpha<=0)return;
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+ctx.strokeStyle=this.color;
+ctx.lineWidth=2;
+ctx.globalAlpha=this.alpha*.6;
+ctx.stroke();
+ctx.globalAlpha=1;
+}
+}
 
+let rings=[];
+let frameCount=0;
+
+function animate(){
+ctx.fillStyle='rgba(10,10,26,.15)';
+ctx.fillRect(0,0,W,H);
+frameCount++;
+
+// Launch fireworks randomly
+if(frameCount%15===0){
+fireworks.push(new Firework());
+}
+
+// Ring bursts around center every 40 frames
+if(frameCount%40===0){
+rings.push(new RingBurst(W/2,H/2));
+}
+
+// Update & draw fireworks
+for(let i=fireworks.length-1;i>=0;i--){
+fireworks[i].update();
+fireworks[i].draw();
+if(fireworks[i].exploded)fireworks.splice(i,1);
+}
+
+// Update & draw particles
+for(let i=particles.length-1;i>=0;i--){
+particles[i].update();
+particles[i].draw();
+if(particles[i].alpha<=0)particles.splice(i,1);
+}
+
+// Update & draw rings
+for(let i=rings.length-1;i>=0;i--){
+rings[i].update();
+rings[i].draw();
+if(rings[i].alpha<=0)rings.splice(i,1);
+}
+
+// Central glow pulse
+const pulse=Math.sin(Date.now()*.003)*.3+.7;
+const grad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,150);
+grad.addColorStop(0,'rgba(168,85,247,'+(pulse*.15)+')');
+grad.addColorStop(.5,'rgba(236,72,153,'+(pulse*.08)+')');
+grad.addColorStop(1,'rgba(0,0,0,0)');
+ctx.fillStyle=grad;
+ctx.fillRect(0,0,W,H);
+
+animId=requestAnimationFrame(animate);
+}
+
+animate();
+
+// Launch a bunch of fireworks at start
+setTimeout(()=>{
+for(let i=0;i<5;i++){
+setTimeout(()=>fireworks.push(new Firework()),i*200);
+}
+},300);
+
+// More fireworks at 2 seconds
+setTimeout(()=>{
+for(let i=0;i<8;i++){
+setTimeout(()=>fireworks.push(new Firework()),i*150);
+}
+// Extra ring bursts
+rings.push(new RingBurst(W/2,H/2));
+setTimeout(()=>rings.push(new RingBurst(W/2,H/2)),300);
+setTimeout(()=>rings.push(new RingBurst(W/2,H/2)),600);
+},2000);
+
+// Grand finale at 3.5 seconds
+setTimeout(()=>{
+for(let i=0;i<12;i++){
+setTimeout(()=>fireworks.push(new Firework()),i*100);
+}
+rings.push(new RingBurst(W/2,H/2));
+},3500);
+
+// Hide splash after 5 seconds
+setTimeout(()=>{
+document.getElementById('splash').classList.add('hide');
+document.body.classList.remove('splash-active');
+cancelAnimationFrame(animId);
+},5000);
+})();
+</script>
+
+<div id="emoji-container"></div>
+
+<!-- NAV -->
+<nav class="fixed top-0 left-0 right-0 z-50 h-14 border-b border-purple-500/20" style="background:rgba(10,10,26,.9);backdrop-filter:blur(16px)">
+<div class="max-w-5xl mx-auto h-full px-5 flex items-center justify-between">
+<a href="#home" class="flex items-center gap-2"><span class="text-lg">🌟</span><span class="font-geist font-extrabold text-base bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">বুড়া বেডী</span></a>
+<div class="hidden md:flex items-center gap-6">
+<a href="#home" class="text-sm font-bold text-purple-300 hover:text-purple-100 transition-colors">হোম</a>
+<a href="#letter" class="text-sm font-bold text-purple-300 hover:text-purple-100 transition-colors">চিঠি</a>
+<a href="#chat" class="text-sm font-bold text-purple-300 hover:text-purple-100 transition-colors">আমাদের কথা</a>
+<a href="#why" class="text-sm font-bold text-purple-300 hover:text-purple-100 transition-colors">কেন আলাদা</a>
+<a href="#word" class="text-sm font-bold text-purple-300 hover:text-purple-100 transition-colors">কথা</a>
+</div>
+<button onclick="launchConfetti()" class="px-3 py-1.5 rounded-full border border-purple-500/40 hover:bg-purple-500/20 transition text-sm">🎉</button>
+</div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+<div class="absolute top-20 right-16 w-72 h-72 rounded-full bg-purple-600/20 blur-3xl"></div>
+<div class="absolute bottom-20 left-16 w-72 h-72 rounded-full bg-pink-600/20 blur-3xl"></div>
+<div class="absolute top-1/2 left-1/2 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+<div class="relative z-10 text-center px-6 max-w-3xl mx-auto pt-28 pb-16 lg:pt-40 lg:pb-24">
+<div class="ani mb-6 flex justify-center"><div class="relative pulse-ring w-20 h-20 flex items-center justify-center"><div class="heartbeat text-5xl">🌟</div></div></div>
+<p class="ani d1 text-xs font-extrabold uppercase tracking-[.25em] text-purple-400 mb-4">✦ আপনি স্পেশাল মানুষ ✦</p>
+<h1 class="ani d2 font-geist text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-5"><span class="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent grad-anim">বুড়া বেডী</span></h1>
+<p class="ani d3 text-lg md:text-xl text-purple-200 font-bold leading-relaxed max-w-md mx-auto mb-2">হয়তো আপনার রাগ বেশি কিন্তু আপনার মনটা অনেক বড়</p>
+<p class="ani d4 text-base text-pink-300 font-bold max-w-sm mx-auto mb-8">দোয়া করি আপনি যেন এরকম বড় মনের মানুষ হয়ে থাকেন</p>
+<div class="ani d5 flex flex-col sm:flex-row items-center justify-center gap-3">
+<a href="#letter" class="rounded-full px-8 py-3.5 text-base font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:shadow-xl hover:shadow-purple-500/30 transition-all">💌 চিঠি পড়ি</a>
+<a href="#chat" class="rounded-full px-8 py-3.5 text-base font-bold text-purple-300 border-2 border-purple-500/50 hover:bg-purple-500/10 transition-all">💬 আমাদের কথা</a>
+</div>
+<div class="ani d7 mt-14 scroll-bounce"><span class="text-purple-400 text-lg">↓</span></div>
+</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="py-5 overflow-hidden border-y border-purple-500/10" style="background:rgba(168,85,247,.05)">
+<div class="flex whitespace-nowrap marquee">
+<span class="text-2xl font-geist font-black text-purple-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-pink-500/20 mx-2">✦</span>
+<span class="text-2xl font-geist font-black text-pink-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-amber-500/20 mx-2">🌟</span>
+<span class="text-2xl font-geist font-black text-amber-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-purple-500/20 mx-2">✦</span>
+<span class="text-2xl font-geist font-black text-purple-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-pink-500/20 mx-2">🌟</span>
+<span class="text-2xl font-geist font-black text-pink-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-amber-500/20 mx-2">✦</span>
+<span class="text-2xl font-geist font-black text-amber-500/20 mx-5">বুড়া বেডী</span><span class="text-lg text-purple-500/20 mx-2">🌟</span>
+</div>
+</div>
+
+<!-- LETTER -->
+<section id="letter" class="py-20 lg:py-28" style="background:rgba(168,85,247,.03)">
+<div class="max-w-2xl mx-auto px-6">
+<div class="text-center mb-14 sr">
+<p class="text-xs font-extrabold uppercase tracking-[.25em] text-pink-400 mb-3">একটা ছোট্ট কথা</p>
+<h2 class="font-geist text-2xl md:text-4xl font-black text-white"><span class="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">বুড়া বেডী,</span> শোনো</h2>
+</div>
+<div class="sr card p-8 md:p-12">
+<div class="text-center mb-6"><span class="text-4xl">💌</span></div>
+<div class="space-y-5 leading-[2] text-base md:text-lg">
+<p class="text-purple-300 font-extrabold text-lg">বুড়া বেডী,</p>
+<p class="text-white font-bold">জানো, আমি মাঝেমধ্যে মেসেজ দেওয়ার চেষ্টা করি — কিন্তু তুমি কখনো মেসেজ দেওয়ার চেষ্টা করো নি।  তাতে কিছু মনে করি না আপনি ভুলে যেতে পারেন কিন্তু আমি বলে যাইনি সেজন্য তো মেসেজ দিয়েছি— <span class="text-purple-400 font-extrabold">বুড়া বেডি।</span></p>
+<p class="text-white font-bold">এক বছর ধরে কোনো কথা হয়নি। আমি মেসেজ দিতাম না — তুমিও দিতে না। কিন্তু গতকাল আবার <span class="text-pink-400 font-extrabold">আমি দিলাম।</span> আর তুমি রিপ্লাই দিলে </p>
+<p class="text-white font-bold">তুমি রাগ বেশি করো — কিন্তু মনটা ভালো। এটা কম মানুষের থাকে। আর <span class="text-amber-400 font-extrabold">এটা আমাকে মুগ্ধ করেছে বুড়া বেডী।</span></p>
+<p class="text-white font-bold">আমি মেসেজ দেবো — তুমি দেবে না, <span class="text-purple-400 font-extrabold">আমিই দেবো।</span> এই তো আমাদের নিয়ম। আর এই নিয়মটাও ভালো।</p>
+<p class="text-purple-400 font-extrabold pt-3 text-lg">তোমার কাছের এক লাইন বেশি বুঝে মানুষ,<br>🌟</p>
+</div>
+<div class="flex justify-center mt-6"><div class="w-12 h-12 rounded-full bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center"><span class="text-lg">✨</span></div></div>
+</div>
+</div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="py-20 lg:py-28" style="background:rgba(236,72,153,.03)">
+<div class="max-w-lg mx-auto px-6">
+<div class="text-center mb-14 sr">
+<p class="text-xs font-extrabold uppercase tracking-[.25em] text-amber-400 mb-3">গতকাল রাত</p>
+<h2 class="font-geist text-2xl md:text-4xl font-black text-white"><span class="bg-gradient-to-r from-amber-400 to-pink-400 bg-clip-text text-transparent">বুড়া বেডীর</span> সাথে কথা</h2>
+<p class="text-amber-300 text-base font-bold mt-3">আমি মেসেজ দিলাম — আপনি রিপ্লাই দিলেন</p>
+</div>
+
+<div class="sr max-w-[340px] mx-auto rounded-2xl border-2 border-purple-500/30 overflow-hidden" style="background:rgba(15,15,35,.9)">
+<div class="px-4 py-2 flex items-center justify-between text-[10px] text-purple-300 font-bold" style="background:rgba(168,85,247,.1)"><span>১০:০৮ PM</span><span>📶 🔋</span></div>
+<div class="px-4 py-3 flex items-center gap-3 border-b border-purple-500/20">
+<span class="text-2xl">🌟</span>
+<div><p class="text-purple-200 text-sm font-extrabold">বুড়া বেডী</p><p class="text-green-400 text-[10px] font-bold">● অনলাইন</p></div>
+</div>
+<div class="p-3 space-y-2" style="min-height:400px;background:rgba(10,10,26,.5)">
+<div class="text-center"><span class="text-[9px] text-purple-400 px-3 py-1 rounded-full border border-purple-500/30 font-bold" style="background:rgba(168,85,247,.1)">গতকাল রাত</span></div>
+<div class="flex justify-end msg-pop" style="animation-delay:.2s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-br-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500">Assalamu alaikum  kemon achen</div></div>
+<div class="flex justify-start msg-pop" style="animation-delay:.4s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-bl-sm text-sm font-bold text-purple-100 bg-purple-500/20 border border-purple-500/30">Walaikumassalam 
+Assalamualaikum _Ji alhamdulillah valo</div></div>
+<div class="flex justify-end msg-pop" style="animation-delay:.6s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-br-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500">Walaikum salam  Aponi ki nusyiba apu..?</div></div>
+<div class="flex justify-start msg-pop" style="animation-delay:.8s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-bl-sm text-sm font-bold text-purple-100 bg-purple-500/20 border border-purple-500/30">Humm .vule gelcen naki bon k ?</div></div>
+<div class="flex justify-end msg-pop" style="animation-delay:1s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-br-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500">বোন বলিনাই
+ভুলিনাই এমন কি আপনার জন্ম তারিখ মনে রেখেছি 28.09.2007</div></div>
+<div class="flex justify-start msg-pop" style="animation-delay:1.2s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-bl-sm text-sm font-bold text-purple-100 bg-purple-500/20 border border-purple-500/30">Tai tw etodin khobor nen nai 😅  Biye kore tw akebare udaw</div></div>
+<div class="flex justify-end msg-pop" style="animation-delay:1.4s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-br-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500">Oh accha কে বলছে খবর নেই নাই এইতো খবর নিলাম😊যদি  হারিয়ে যেতাম তাহলে কি আপনার খোঁজখবর নিতাম</div></div>
+<div class="flex justify-start msg-pop" style="animation-delay:1.6s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-bl-sm text-sm font-extrabold text-red-200 bg-red-500/30 border-2 border-red-500/50">Koi bosor por ? 😒</div></div>
+<div class="flex justify-end msg-pop" style="animation-delay:1.8s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-br-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500">প্রায় এক বছর এর কাছাকাছি হবে🤔</div></div>
+<div class="flex justify-start msg-pop" style="animation-delay:2s"><div class="max-w-[80%] px-3 py-2 rounded-xl rounded-bl-sm text-sm font-bold text-purple-100 bg-purple-500/20 border border-purple-500/30">Tai tw vebe nicilam</div></div>
+<div class="flex justify-start"><div class="px-3 py-2.5 rounded-xl rounded-bl-sm dot-typing bg-purple-500/20 border border-purple-500/30"><span></span><span></span><span></span></div></div>
+</div>
+<div class="px-4 py-2 border-t border-purple-500/20 flex items-center gap-2" style="background:rgba(168,85,247,.05)"><div class="flex-1 px-3 py-1.5 rounded-full text-xs text-purple-400 font-bold bg-purple-500/10 border border-purple-500/20">লিখুন...</div><span class="text-purple-400">📩</span></div>
+</div>
+
+<div class="grid grid-cols-2 gap-4 mt-10">
+<div class="sr text-center p-5 card"><span class="text-3xl block mb-2 float-anim">📱</span><p class="text-purple-200 text-base font-extrabold">আপনার কথা মনে পড়ে</p><p class="text-purple-400 text-sm font-bold mt-1">কিন্তু তোমার তো আমার কথা মনে পড়ে না</p></div>
+<div class="sr text-center p-5 card" style="border-color:rgba(236,72,153,.2)"><span class="text-3xl block mb-2 float-anim" style="animation-delay:.4s">💬</span><p class="text-pink-200 text-base font-extrabold">তোমি যে রিপ্লাই করেছ এটাই অনেক</p><p class="text-pink-400 text-sm font-bold mt-1">আমিতো ভাবছিলাম তোমি রিপ্লাই দিবে না</p></div>
+</div>
+
+<div class="mt-10 space-y-3">
+<div class="sr p-5 card flex items-start gap-3" style="border-color:rgba(245,158,11,.2)"><span class="text-2xl shrink-0">🐼</span><div><h4 class="text-amber-300 text-base font-extrabold mb-1">বুড়া বেডির রাগ</h4><p class="text-amber-200 text-sm font-bold">30% রাগ এবং 70% মায়া  </p></div></div>
+<div class="sr p-5 card flex items-start gap-3"><span class="text-2xl shrink-0">🎂</span><div><h4 class="text-purple-300 text-base font-extrabold mb-1">জন্মদিন মনে আছে</h4><p class="text-purple-200 text-sm font-bold">28.09.2007 — বুড়া বেডীর জন্মদিন ভুলিনি!</p></div></div>
+</div>
+</div>
+</section>
+
+<!-- WHY SPECIAL -->
+<section id="why" class="py-20 lg:py-28" style="background:rgba(16,185,129,.03)">
+<div class="max-w-4xl mx-auto px-6">
+<div class="text-center mb-14 sr">
+<p class="text-xs font-extrabold uppercase tracking-[.25em] text-emerald-400 mb-3">কারণ আছে</p>
+<h2 class="font-geist text-2xl md:text-4xl font-black text-white"><span class="bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">বুড়া বেডী</span> কেন আলাদা</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+<div class="sr group p-5 card"><div class="w-11 h-11 rounded-lg bg-purple-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">😤</span></div><h4 class="text-purple-200 text-base font-extrabold mb-1">বুড়া বেডীর রাগ</h4><p class="text-purple-300 text-sm font-bold leading-relaxed">রাগ করে কিন্তু পাঁচ মিনিট পর নিজেই হেসে ফেলে। এই রাগটা কিউট।</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(236,72,153,.2)"><div class="w-11 h-11 rounded-lg bg-pink-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">😊</span></div><h4 class="text-pink-200 text-base font-extrabold mb-1">বুড়া বেডীর মন</h4><p class="text-pink-300 text-sm font-bold leading-relaxed">রাগ বেশি কিন্তু মনটা ভালো। এটা কম মানুষের থাকে।</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(245,158,11,.2)"><div class="w-11 h-11 rounded-lg bg-amber-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">🐼</span></div><h4 class="text-amber-200 text-base font-extrabold mb-1">মনছায় আপনার সাথে আগের মতো ডং করবো</h4><p class="text-amber-300 text-sm font-bold leading-relaxed">কিন্তু সে পরিস্থিতি এখন আর নেই এখনও কিছু আপনাকে বয়ে বলতে পারি না</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(16,185,129,.2)"><div class="w-11 h-11 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">💬</span></div><h4 class="text-emerald-200 text-base font-extrabold mb-1">তুমি তো নিজে থেকে</h4><p class="text-emerald-300 text-sm font-bold leading-relaxed">কখনো মেসেজ দিবে না— কিন্তু রিপ্লাই তো করতে পারবেন। আর এটাই আমার কাছে অনেক।</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(59,130,246,.2)"><div class="w-11 h-11 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">💪</span></div><h4 class="text-blue-200 text-base font-extrabold mb-1">বুড়া বেডী শক্ত</h4><p class="text-blue-300 text-sm font-bold leading-relaxed">কঠিন সময়েও হাসিমুখে সামলায়। এটা শেখার মতো।</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(239,68,68,.2)"><div class="w-11 h-11 rounded-lg bg-red-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">🌟</span></div><h4 class="text-red-200 text-base font-extrabold mb-1">বুড়া বেডী </h4><p class="text-red-300 text-sm font-bold leading-relaxed">এই পৃথিবীতে বুড়া বেডী একটাই। রাগ, হাসি, মন, ইত্যাদি — সব মিলিয়ে একটাই।</p></div>
+</div>
+</div>
+</section>
+
+<!-- PROMISE -->
+<section id="word" class="py-20 lg:py-28" style="background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(236,72,153,.05),rgba(245,158,11,.05))">
+<div class="max-w-2xl mx-auto px-6 text-center">
+<div class="sr">
+<div class="heartbeat text-6xl mb-6">🌟</div>
+<p class="text-xs font-extrabold uppercase tracking-[.25em] text-purple-400 mb-4">একটা কথা দিচ্ছি</p>
+<h2 class="font-geist text-2xl md:text-4xl lg:text-5xl font-black text-white leading-[1.15] mb-6">বুড়া বেডী,<br><span class="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 bg-clip-text text-transparent grad-anim">আমি মেসেজ দেবোই</span></h2>
+<p class="text-base text-purple-200 font-bold leading-relaxed max-w-md mx-auto mb-10">তুমি নিজে থেকে মেসেজ দাও না — । আমি মেসেজ দেবো। মাঝে মাঝে হলেও কথা হবে।</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+<div class="p-5 card"><span class="text-2xl block mb-2">📱</span><h4 class="text-purple-200 text-sm font-extrabold">আমি মেসেজ দেবো</h4><p class="text-purple-400 text-xs font-bold mt-1">তোমি রিপ্লাই দিবেনতো..?</p></div>
+<div class="p-5 card" style="border-color:rgba(236,72,153,.2)"><span class="text-2xl block mb-2">💬</span><h4 class="text-pink-200 text-sm font-extrabold">তোমি রিপ্লাই দিলে</h4><p class="text-pink-400 text-xs font-bold mt-1">সেটাই অনেক</p></div>
+<div class="p-5 card" style="border-color:rgba(245,158,11,.2)"><span class="text-2xl block mb-2">🌟</span><h4 class="text-amber-200 text-sm font-extrabold">মেসেজ দিলে রাগ করবেন না তো..?</h4><p class="text-amber-400 text-xs font-bold mt-1">মাঝে মাঝে হলেও মেসেজ দিবেন। .</p></div>
+</div>
+<button onclick="showToast()" class="rounded-full px-8 py-3.5 text-base font-extrabold text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:shadow-xl hover:shadow-purple-500/30 transition-all cursor-pointer">🌟 বুড়া বেডী, তোমার মন অনেক বড়</button>
+</div>
+</div>
+</section>
+
+<!-- LAST WORDS -->
+<section class="py-20" style="background:rgba(168,85,247,.03)">
+<div class="max-w-xl mx-auto px-6">
+<div class="sr text-center p-8 card">
+<span class="text-4xl mb-4 block wiggle">🎁</span>
+<h3 class="font-geist text-xl md:text-2xl font-black mb-3 text-white">বুড়া বেডী, শেষ কথা</h3>
+<p class="text-purple-200 font-bold text-base leading-relaxed">তুমি নিজে থেকে মেসেজ দাও না — আমি জানি। কিন্তু আমি দিলে তুমি রিপ্লাই দিলে হবে — এটাও কম কথা নয়। এক বছর কথা হয়নি, গতকাল আমি আবার মেসেজ দিলাম তুমি রিপ্লাই দিলে বুড়া বেডী ! এখনো সেই বুড়া বেডী — রাগ করো, হাসো, রিপ্লাই করো। <span class="text-pink-400 font-extrabold">আমি মেসেজ দিবো আপনাকে জ্বালাবো।</span> 🌟</p>
+<div class="mt-5 flex flex-wrap justify-center gap-2">
+<span class="px-4 py-2 rounded-full bg-purple-500/20 text-purple-300 text-sm font-extrabold border border-purple-500/30">বুড়া বেডী</span>
+<span class="px-4 py-2 rounded-full bg-pink-500/20 text-pink-300 text-sm font-extrabold border border-pink-500/30">10 বাচ্চার মা</span>
+<span class="px-4 py-2 rounded-full bg-amber-500/20 text-amber-300 text-sm font-extrabold border border-amber-500/30">পেত্নী</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- BIG NAME -->
+<section class="py-16 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 overflow-hidden relative">
+<div class="absolute top-3 left-6 text-white/20 text-sm font-extrabold">বুড়া বেডী</div>
+<div class="absolute bottom-3 right-6 text-white/20 text-sm font-extrabold">বুড়া বেডী</div>
+<div class="absolute top-1/2 left-3 text-white/10 text-xs font-bold">বুড়া বেডী</div>
+<div class="absolute top-1/3 right-3 text-white/10 text-xs font-bold">বুড়া বেডী</div>
+<div class="text-center">
+<p class="text-white/70 text-xs font-extrabold uppercase tracking-[.25em] mb-4">এই নামটা ভুলতে পারি না</p>
+<h2 class="font-geist text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight name-glow">বুড়া বেডী</h2>
+<p class="text-white/60 text-base mt-4 font-extrabold">তোমার মতো আর কেউ নেই ✦</p>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-10 bg-slate-950 text-center">
+<div class="heartbeat text-2xl mb-3">🌟</div>
+<p class="font-geist text-xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1">বুড়া বেডী</p>
+<p class="text-purple-300 text-sm font-extrabold">কোন কিছু ভুল করে থাকলে মাফ করে দিবেন 👃🏻👃🏻</p>
+<p class="text-purple-500 text-xs mt-3 font-extrabold">**ইতি**______**Md.Sshraful**</p>
+</footer>
+
+<div id="toast-container" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"></div>
+
+<script>
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('copy',e=>e.preventDefault());
+document.addEventListener('cut',e=>e.preventDefault());
+document.addEventListener('selectstart',e=>e.preventDefault());
+document.addEventListener('dragstart',e=>e.preventDefault());
+
+(function(){
+const c=document.getElementById('emoji-container');
+const e=['🌟','✨','💫','📱','🌙','😊','🐼','🎂'];
+setInterval(()=>{
+const d=document.createElement('div');d.className='float-emoji';
+d.textContent=e[~~(Math.random()*e.length)];
+d.style.left=Math.random()*100+'vw';
+d.style.fontSize=(Math.random()*14+12)+'px';
+d.style.animationDuration=(Math.random()*12+10)+'s';
+d.style.animationDelay=Math.random()*2+'s';
+c.appendChild(d);setTimeout(()=>d.remove(),24000);
+},3000);
+})();
+
+const obs=new IntersectionObserver(entries=>{
+entries.forEach(en=>{if(en.isIntersecting){en.target.style.animation='fadeInUp .8s ease-out forwards';obs.unobserve(en.target)}});
+},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.sr').forEach(el=>obs.observe(el));
+
+function launchConfetti(){
+const cols=['#a855f7','#ec4899','#f59e0b','#10b981','#3b82f6'];
+for(let i=0;i<50;i++){
+const c=document.createElement('div');c.className='confetti';
+c.style.left=Math.random()*100+'vw';c.style.backgroundColor=cols[~~(Math.random()*cols.length)];
+c.style.animationDuration=(Math.random()*2+2)+'s';c.style.animationDelay=Math.random()*.5+'s';
+c.style.borderRadius=Math.random()>.5?'50%':'2px';c.style.width=(Math.random()*6+3)+'px';c.style.height=(Math.random()*6+3)+'px';
+document.body.appendChild(c);setTimeout(()=>c.remove(),4000);
+}
+showToast('🎉 বুড়া বেডী!');
+}
+
+function showToast(msg){
+const c=document.getElementById('toast-container');
+const ms=msg?[msg]:['🌟 বুড়া বেডী সেরা!','🐼 NO NO NO!','📱 আমি মেসেজ দেবোই!','🎂 ২৮.০৯.২০০৭','😊 হাসো সবসময়!'];
+const t=document.createElement('div');
+t.className='toast-in px-5 py-2.5 rounded-full border-2 border-purple-500/40 text-sm font-extrabold text-purple-200';
+t.style.background='rgba(10,10,26,.95)';t.style.backdropFilter='blur(12px)';
+t.textContent=ms[~~(Math.random()*ms.length)];
+c.innerHTML='';c.appendChild(t);
+setTimeout(()=>{t.className=t.className.replace('toast-in','toast-out');setTimeout(()=>t.remove(),300)},2500);
+}
+
+document.addEventListener('click',e=>{
+const em=['🌟','✨','🐼','🎉','😊','🎂'];
+for(let i=0;i<3;i++){
+const d=document.createElement('div');d.textContent=em[~~(Math.random()*em.length)];
+d.style.cssText=`position:fixed;left:${e.clientX}px;top:${e.clientY}px;font-size:${10+Math.random()*10}px;pointer-events:none;z-index:9999;transition:all ${.5+Math.random()*.3}s ease-out;`;
+document.body.appendChild(d);
+requestAnimationFrame(()=>{d.style.transform=`translate(${Math.random()*50-25}px,${-30-Math.random()*30}px) scale(.5)`;d.style.opacity='0'});
+setTimeout(()=>d.remove(),1000);
+}
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+</script>
 </body>
 </html>
-
