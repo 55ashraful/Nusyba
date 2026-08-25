@@ -96,9 +96,30 @@ html{scroll-behavior:smooth}
 ::-webkit-scrollbar-track{background:#0a0a1a}
 ::-webkit-scrollbar-thumb{background:linear-gradient(#a855f7,#ec4899);border-radius:3px}
 .sr{opacity:0}
+/* ধীরে ধীরে ভেসে বেড়ানো লাভ ডিজাইন */
+#slow-floating-heart {
+    position: fixed;
+    z-index: 1000000;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+#slow-floating-heart span {
+    font-size: 55px; 
+    filter: drop-shadow(0 0 15px rgba(255, 0, 85, 0.8));
+    user-select: none;
+}
 </style>
 </head>
 <body class="font-inter splash-active">
+<!-- এই লাভটি ধীরে ধীরে সব দিকে ঘুরবে -->
+<a href="story.html" id="slow-floating-heart">
+    <span>❤️</span>
+</a>
 
 <script>
 document.addEventListener('contextmenu',e=>e.preventDefault());
@@ -612,6 +633,56 @@ setTimeout(()=>d.remove(),1000);
 
 // ===== SMOOTH SCROLL =====
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+</script>
+<script>
+(function() {
+    const heart = document.getElementById('slow-floating-heart');
+    const size = 60; 
+
+    let posX = Math.random() * (window.innerWidth - size);
+    let posY = Math.random() * (window.innerHeight - size);
+    
+    // গতি একদম কমিয়ে দেওয়া হয়েছে (0.8 মানে খুব ধীরে)
+    let moveX = 0.8; 
+    let moveY = 0.6; 
+    let angle = 0;
+
+    function animate() {
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+
+        // অবস্থান পরিবর্তন
+        posX += moveX;
+        posY += moveY;
+        
+        // খুব ধীরে ধীরে ঘোরা (0.5 ডিগ্রি করে)
+        angle += 0.5; 
+
+        // দেয়ালে ধাক্কা খেলে দিক পরিবর্তন
+        if (posX <= 0 || posX >= winW - size) {
+            moveX *= -1;
+        }
+        if (posY <= 0 || posY >= winH - size) {
+            moveY *= -1;
+        }
+
+        heart.style.left = posX + 'px';
+        heart.style.top = posY + 'px';
+        
+        // চলাচল + ধীর ঘূর্ণন + হালকা বড়-ছোট হওয়ার ইফেক্ট
+        heart.style.transform = `rotate(${angle}deg) scale(${1 + Math.sin(Date.now()*0.002) * 0.1})`;
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // স্ক্রিন বড়-ছোট করলে পজিশন ঠিক রাখা
+    window.addEventListener('resize', () => {
+        posX = Math.min(posX, window.innerWidth - size);
+        posY = Math.min(posY, window.innerHeight - size);
+    });
+})();
 </script>
 </body>
 </html>
