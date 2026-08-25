@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>রোমান্টিক গল্পের ডায়েরি</title>
+    <title>বুড়া বেডি</title>
     <!-- Tailwind and Fonts from your main site -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Geist:wght@400;700;900&display=swap" rel="stylesheet">
@@ -18,13 +18,18 @@
         }
     </script>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a1a; /* আপনার সাইটের মূল ব্যাকগ্রাউন্ড */
-            color: #fff;
-            overflow-x: hidden;
-        }
+   <style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #0a0a1a; 
+        color: #fff;
+        overflow-x: hidden;
+
+        /* এই ৩টি লাইন যোগ করুন */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none; 
+    }
         
         /* আপনার সাইটের কার্ড স্টাইল */
         .story-card {
@@ -88,7 +93,7 @@
     <nav class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-purple-500/20" style="background:rgba(10,10,26,0.9); backdrop-filter:blur(16px)">
         <div class="max-w-5xl mx-auto h-full px-5 flex items-center justify-between">
     <h1 class="font-geist font-black text-2xl grad-text">রোমান্টিক ডায়েরি</h1>
-    <a href="index.html" class="text-xs font-bold text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full hover:bg-purple-500/10 transition">হোম</a>
+    <a href="index.html" class="text-xs font-bold text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full hover:bg-purple-500/10 transition">Humm</a>
 </div>
     </nav>
 
@@ -199,5 +204,20 @@
             window.scrollTo(0,0);
         }
     </script>
+    <script>
+    // রাইট ক্লিক বন্ধ করা
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // কিবোর্ড শর্টকাট (Ctrl+C, Ctrl+U, Ctrl+S) বন্ধ করা
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'a' || e.key === 'i')) {
+            e.preventDefault();
+        }
+        // F12 (Inspect Element) বন্ধ করা
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+    });
+</script>
 </body>
 </html>
