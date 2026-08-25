@@ -17,6 +17,32 @@ body.splash-active{overflow:hidden}
 #bouncing-photo{position:fixed;z-index:3;width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #ef4444;box-shadow:0 0 25px rgba(239,68,68,.5),0 0 50px rgba(239,68,68,.2);pointer-events:none;will-change:transform,left,top;transition:none}
 #bouncing-photo.hidden-photo{opacity:0;transition:opacity .8s ease}
 
+/* ===== FLOATING ROMANTIC HEART BUTTON ===== */
+#floating-heart-btn{
+position:fixed;
+z-index:9998;
+width:65px;
+height:65px;
+background:linear-gradient(135deg, #ff4b2b, #ff416c);
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 0 25px rgba(255, 65, 108, 0.7), 0 0 50px rgba(255, 75, 43, 0.4);
+border:2px solid rgba(255, 255, 255, 0.4);
+transition:transform 0.2s ease;
+will-change:left, top;
+}
+#floating-heart-btn:hover{transform:scale(1.15)}
+#floating-heart-btn span{font-size:32px;animation:heartbeat 1.5s ease-in-out infinite}
+
+/* ===== ROMANTIC MESSAGE MODAL ===== */
+#romantic-modal{position:fixed;inset:0;z-index:99999;background:rgba(10,10,26,0.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s ease}
+#romantic-modal.active{opacity:1;visibility:visible}
+.romantic-card{background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(236,72,153,0.15));border:2px solid rgba(236,72,153,0.5);border-radius:20px;padding:25px;max-width:340px;width:90%;text-align:center;box-shadow:0 0 40px rgba(236,72,153,0.4);transform:scale(0.8);transition:transform 0.3s ease}
+#romantic-modal.active .romantic-card{transform:scale(1)}
+
 /* ===== PHOTO STYLES ===== */
 .photo-splash{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(168,85,247,.6);box-shadow:0 0 30px rgba(168,85,247,.4),0 0 60px rgba(236,72,153,.2);animation:splashFloat 2s ease-in-out infinite}
 .photo-hero{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(168,85,247,.5);box-shadow:0 0 20px rgba(168,85,247,.3),0 0 40px rgba(236,72,153,.15)}
@@ -112,6 +138,21 @@ document.addEventListener('keydown',e=>{if(e.ctrlKey&&['c','u','s','a'].includes
 <!-- BOUNCING PHOTO -->
 <img id="bouncing-photo" src="https://i.ibb.co/zTSNr4q4/1000104118.jpg" alt="বুড়া বেডী">
 
+<!-- ===== FLOATING ROMANTIC HEART BUTTON ===== -->
+<div id="floating-heart-btn" title="ক্লিক করুন!">
+<span>❤️</span>
+</div>
+
+<!-- ===== ROMANTIC MESSAGE MODAL ===== -->
+<div id="romantic-modal">
+<div class="romantic-card">
+<div class="text-3xl mb-3">💖</div>
+<h3 class="font-geist text-xl font-black text-pink-300 mb-2">বিশেষ রোমান্টিক বার্তা</h3>
+<p id="romantic-msg-text" class="text-purple-200 text-base font-bold leading-relaxed mb-5">এখানে মেসেজ দেখাবে...</p>
+<button onclick="closeRomanticModal()" class="px-6 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-sm shadow-lg hover:scale-105 transition">ধন্যবাদ 🌸</button>
+</div>
+</div>
+
 <!-- ===== SPLASH SCREEN ===== -->
 <div id="splash">
 <canvas id="splash-canvas"></canvas>
@@ -157,6 +198,52 @@ setTimeout(function(){
 img.classList.add('hidden-photo');
 setTimeout(function(){img.style.display='none'},800);
 },5000);
+})();
+</script>
+
+<script>
+// ===== FLOATING HEART BUTTON MOVEMENT & INTERACTION =====
+(function(){
+const heartBtn=document.getElementById('floating-heart-btn');
+const modal=document.getElementById('romantic-modal');
+const msgText=document.getElementById('romantic-msg-text');
+const size=65;
+let x=Math.random()*(window.innerWidth-size);
+let y=Math.random()*(window.innerHeight-size);
+let vx=1.5; // ধীরে ধীরে ঘোরার গতি
+let vy=1.2;
+
+heartBtn.style.left=x+'px';
+heartBtn.style.top=y+'px';
+
+function moveHeart(){
+const W=window.innerWidth;
+const H=window.innerHeight;
+x+=vx; y+=vy;
+if(x<=0){x=0; vx=Math.abs(vx);}
+if(x>=W-size){x=W-size; vx=-Math.abs(vx);}
+if(y<=0){y=0; vy=Math.abs(vy);}
+if(y>=H-size){y=H-size; vy=-Math.abs(vy);}
+heartBtn.style.left=x+'px';
+heartBtn.style.top=y+'px';
+requestAnimationFrame(moveHeart);
+}
+moveHeart();
+
+// ক্লিক করলে র্যান্ডম রোমান্টিক মেসেজ দেখানো
+heartBtn.addEventListener('click', function(){
+if(typeof romanticMessages !== 'undefined' && romanticMessages.length > 0){
+const randomMsg = romanticMessages[Math.floor(Math.random() * romanticMessages.length)];
+msgText.textContent = randomMsg;
+} else {
+msgText.textContent = "বুড়া বেডী, তোমার রাগ যতই থাকুক না কেন, মনটা অনেক সুন্দর! 💖";
+}
+modal.classList.add('active');
+});
+
+window.closeRomanticModal = function(){
+modal.classList.remove('active');
+}
 })();
 </script>
 
@@ -293,7 +380,7 @@ setTimeout(()=>{document.getElementById('splash').classList.add('hide');document
 </div>
 </div>
 
-<!-- Birthday Today Message (hidden by default) -->
+<!-- Birthday Today Message -->
 <div id="birthday-today" class="hidden text-center mb-8">
 <div class="inline-block px-10 py-6 rounded-2xl border-2 border-amber-400/50" style="background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(236,72,153,.1))">
 <p class="font-geist text-3xl md:text-5xl font-black birthday-today bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">🎉 জন্মদিন মোবারক! 🎉</p>
@@ -334,8 +421,8 @@ setTimeout(()=>{document.getElementById('splash').classList.add('hide');document
 <div class="text-center mb-6"><span class="text-4xl">💌</span></div>
 <div class="space-y-5 leading-[2] text-base md:text-lg">
 <p class="text-purple-300 font-extrabold text-lg">বুড়া বেডী,</p>
-<p class="text-white font-bold">জানো, আমি মাঝেমধ্যে মেসেজ দেওয়ার চেষ্টা করি — কিন্তু তুমি কখনো মেসেজ দেওয়ার চেষ্টা করো নি।  তাতে কিছু মনে করি না আপনি ভুলে যেতে পারেন কিন্তু আমি বলে যাইনি সেজন্য তো মেসেজ দিয়েছি— <span class="text-purple-400 font-extrabold">বুড়া বেডি।</span></p>
-<p class="text-white font-bold">এক বছর ধরে কোনো কথা হয়নি। আমি মেসেজ দিতাম না — তুমিও দিতে না। কিন্তু গতকাল আবার <span class="text-pink-400 font-extrabold">আমি দিলাম।</span> আর তুমি রিপ্লাই দিলে </p>
+<p class="text-white font-bold">জানো, আমি মাঝেমধ্যে মেসেজ দেওয়ার চেষ্টা করি — কিন্তু তুমি কখনো মেসেজ দেওয়ার চেষ্টা করো নি। তাতে কিছু মনে করি না আপনি ভুলে যেতে পারেন কিন্তু আমি বলে যাইনি সেজন্য তো মেসেজ দিয়েছি— <span class="text-purple-400 font-extrabold">বুড়া বেডি।</span></p>
+<p class="text-white font-bold">এক বছর ধরে কোনো কথা হয়নি। আমি মেসেজ দিতাম না — তুমিও দিতে না। কিন্তু গতকাল আবার <span class="text-pink-400 font-extrabold">আমি দিলাম।</span> আর তুমি রিপ্লাই দিলে</p>
 <p class="text-white font-bold">তুমি রাগ বেশি করো — কিন্তু মনটা ভালো। এটা কম মানুষের থাকে। আর <span class="text-amber-400 font-extrabold">এটা আমাকে মুগ্ধ করেছে বুড়া বেডী।</span></p>
 <p class="text-white font-bold">আমি মেসেজ দেবো — তুমি দেবে না, <span class="text-purple-400 font-extrabold">আমিই দেবো।</span> এই তো আমাদের নিয়ম। আর এই নিয়মটাও ভালো।</p>
 <p class="text-purple-400 font-extrabold pt-3 text-lg">তোমার কাছের এক লাইন বেশি বুঝে মানুষ,<br>🌟</p>
@@ -385,7 +472,7 @@ Assalamualaikum _Ji alhamdulillah valo</div></div>
 </div>
 
 <div class="mt-10 space-y-3">
-<div class="sr p-5 card flex items-start gap-3" style="border-color:rgba(245,158,11,.2)"><span class="text-2xl shrink-0">🐼</span><div><h4 class="text-amber-300 text-base font-extrabold mb-1">বুড়া বেডির রাগ</h4><p class="text-amber-200 text-sm font-bold">30% রাগ এবং 70% মায়া  </p></div></div>
+<div class="sr p-5 card flex items-start gap-3" style="border-color:rgba(245,158,11,.2)"><span class="text-2xl shrink-0">🐼</span><div><h4 class="text-amber-300 text-base font-extrabold mb-1">বুড়া বেডির রাগ</h4><p class="text-amber-200 text-sm font-bold">30% রাগ এবং 70% মায়া</p></div></div>
 <div class="sr p-5 card flex items-start gap-3"><span class="text-2xl shrink-0">🎂</span><div><h4 class="text-purple-300 text-base font-extrabold mb-1">জন্মদিন মনে আছে</h4><p class="text-purple-200 text-sm font-bold">28.09.2007 — বুড়া বেডীর জন্মদিন ভুলিনি!</p></div></div>
 </div>
 </div>
@@ -404,7 +491,7 @@ Assalamualaikum _Ji alhamdulillah valo</div></div>
 <div class="sr group p-5 card" style="border-color:rgba(245,158,11,.2)"><div class="w-11 h-11 rounded-lg bg-amber-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">🐼</span></div><h4 class="text-amber-200 text-base font-extrabold mb-1">মনছায় আপনার সাথে আগের মতো ডং করবো</h4><p class="text-amber-300 text-sm font-bold leading-relaxed">কিন্তু সে পরিস্থিতি এখন আর নেই এখনও কিছু আপনাকে বয়ে বলতে পারি না</p></div>
 <div class="sr group p-5 card" style="border-color:rgba(16,185,129,.2)"><div class="w-11 h-11 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">💬</span></div><h4 class="text-emerald-200 text-base font-extrabold mb-1">তুমি তো নিজে থেকে</h4><p class="text-emerald-300 text-sm font-bold leading-relaxed">কখনো মেসেজ দিবে না— কিন্তু রিপ্লাই তো করতে পারবেন। আর এটাই আমার কাছে অনেক।</p></div>
 <div class="sr group p-5 card" style="border-color:rgba(59,130,246,.2)"><div class="w-11 h-11 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">💪</span></div><h4 class="text-blue-200 text-base font-extrabold mb-1">বুড়া বেডী শক্ত</h4><p class="text-blue-300 text-sm font-bold leading-relaxed">কঠিন সময়েও হাসিমুখে সামলায়। এটা শেখার মতো।</p></div>
-<div class="sr group p-5 card" style="border-color:rgba(239,68,68,.2)"><div class="w-11 h-11 rounded-lg bg-red-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">🌟</span></div><h4 class="text-red-200 text-base font-extrabold mb-1">বুড়া বেডী </h4><p class="text-red-300 text-sm font-bold leading-relaxed">এই পৃথিবীতে বুড়া বেডী একটাই। রাগ, হাসি, মন, ইত্যাদি — সব মিলিয়ে একটাই।</p></div>
+<div class="sr group p-5 card" style="border-color:rgba(239,68,68,.2)"><div class="w-11 h-11 rounded-lg bg-red-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><span class="text-lg">🌟</span></div><h4 class="text-red-200 text-base font-extrabold mb-1">বুড়া বেডী</h4><p class="text-red-300 text-sm font-bold leading-relaxed">এই পৃথিবীতে বুড়া বেডী একটাই। রাগ, হাসি, মন, ইত্যাদি — সব মিলিয়ে একটাই।</p></div>
 </div>
 </div>
 </section>
@@ -466,6 +553,9 @@ Assalamualaikum _Ji alhamdulillah valo</div></div>
 
 <div id="toast-container" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"></div>
 
+<!-- আলাদা ফাইলটি এখানে যুক্ত করা হলো -->
+<script src="messages.js"></script>
+
 <script>
 document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('copy',e=>e.preventDefault());
@@ -476,7 +566,7 @@ document.addEventListener('dragstart',e=>e.preventDefault());
 // ===== BIRTHDAY COUNTDOWN - রিয়েল টাইম =====
 (function(){
 const birthDay=28;
-const birthMonth=8; // সেপ্টেম্বর = মাস ইনডেক্স ৮ (জানুয়ারি=0)
+const birthMonth=8; 
 const birthYear=2007;
 
 const cdDays=document.getElementById('cd-days');
@@ -499,10 +589,8 @@ function updateCountdown(){
 const now=new Date();
 const currentYear=now.getFullYear();
 
-// বর্তমান বছরের পরবর্তী জন্মদিন বের করা
 let nextBirthday=new Date(currentYear,birthMonth,birthDay,0,0,0);
 
-// যদি আজই জন্মদিন হয়
 if(now.getMonth()===birthMonth && now.getDate()===birthDay){
 countdownDisplay.classList.add('hidden');
 birthdayToday.classList.remove('hidden');
@@ -512,7 +600,6 @@ ageBadge.textContent='🎂 আজই জন্মদিন! '+toBanglaNum(age)+'
 return;
 }
 
-// যদি এবছরের জন্মদিন পার হয়ে গেছে, তাহলে পরের বছরের টা নিবো
 if(now>nextBirthday){
 nextBirthday=new Date(currentYear+1,birthMonth,birthDay,0,0,0);
 }
@@ -531,14 +618,11 @@ cdHours.textContent=toBanglaNum(hours);
 cdMins.textContent=toBanglaNum(mins);
 cdSecs.textContent=toBanglaNum(secs);
 
-// বয়স ব্যাজ
 const upcomingAge=nextBirthday.getFullYear()-birthYear;
 ageBadge.textContent='🎯 পরবর্তী বয়স: '+toBanglaNum(upcomingAge)+' বছর';
 
-// মোট দিন বাকি
 totalDaysNum.textContent=toBanglaNum(totalDays)+' দিন';
 
-// গত জন্মদিন থেকে কতদিন
 let lastBirthday=new Date(currentYear,birthMonth,birthDay,0,0,0);
 if(now<lastBirthday){
 lastBirthday=new Date(currentYear-1,birthMonth,birthDay,0,0,0);
