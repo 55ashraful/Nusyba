@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>রোমান্টিক গল্পের ডায়েরি</title>
+    <!-- Tailwind and Fonts from your main site -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Geist:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { inter: ['Inter', 'sans-serif'], geist: ['Geist', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a1a; /* আপনার সাইটের মূল ব্যাকগ্রাউন্ড */
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* আপনার সাইটের কার্ড স্টাইল */
+        .story-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.05));
+            border: 2px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .story-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+        }
+
+        /* গ্রেডিয়েন্ট টেক্সট */
+        .grad-text {
+            background: linear-gradient(135deg, #c084fc, #f472b6, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* ভাসমান গোল বাটন */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(to r, #9333ea, #db2777);
+            border-radius: 50%;
+            display: none; /* শুরুতে বন্ধ */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            z-index: 1000;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ani-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="selection:bg-purple-500/30">
+
+    <!-- NAV (আপনার সাইটের মতো) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-purple-500/20" style="background:rgba(10,10,26,0.9); backdrop-filter:blur(16px)">
+        <div class="max-w-5xl mx-auto h-full px-5 flex items-center justify-center">
+            <h1 class="font-geist font-black text-2xl grad-text">রোমান্টিক ডায়েরি</h1>
+        </div>
+    </nav>
+
+    <div class="container max-w-2xl mx-auto px-6 pt-28 pb-20">
+        
+        <!-- Welcome Section -->
+        <div id="welcome-area" class="text-center mb-10 ani-up">
+            <div class="text-5xl mb-4">📖</div>
+            <p class="text-xs font-extrabold uppercase tracking-[.25em] text-purple-400 mb-2">ভালোবাসার গল্পগুচ্ছ</p>
+            <h2 class="font-geist text-3xl font-black text-white">আপনার প্রিয় গল্পটি পড়ুন</h2>
+        </div>
+
+        <!-- Story List -->
+        <div id="list-area" class="space-y-4 ani-up">
+            <div onclick="readStory(1)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">১. প্রথম বৃষ্টির প্রেম</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+            <div onclick="readStory(2)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">২. নীল খামের চিঠি</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+            <div onclick="readStory(3)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">৩. গোধূলির শেষ ট্রেন</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+        </div>
+
+        <!-- Story Viewer -->
+        <div id="viewer-area" class="hidden ani-up">
+            <div class="story-card p-8 md:p-10">
+                <h2 id="st-title" class="font-geist text-3xl font-black mb-6 grad-text text-center"></h2>
+                <div id="st-content" class="text-purple-100 leading-[1.8] text-lg font-medium whitespace-pre-line text-justify">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Back Button (আপনার চাহিদা মতো গোল বাটন) -->
+    <button id="backBtn" onclick="goBack()" class="floating-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+    </button>
+
+    <footer class="py-10 text-center border-t border-purple-500/10">
+        <p class="font-geist text-lg font-black grad-text">রোমান্টিক ডায়েরি</p>
+        <p class="text-purple-500 text-xs mt-2 font-bold uppercase tracking-widest">© ২০২৪ সর্বস্বত্ব সংরক্ষিত</p>
+    </footer>
+
+    <script>
+        const stories = {
+            1: {
+                title: "প্রথম বৃষ্টির প্রেম",
+                content: `সেদিন আকাশটা খুব মেঘলা ছিল। অম্লান দাঁড়িয়ে ছিল বাসস্ট্যান্ডে। হঠাৎ ঝমঝমিয়ে নামলো বৃষ্টি। সবাই আশ্রয়ের জন্য এদিক ওদিক ছুটছে, ঠিক তখনই এক তরুণী এসে দাঁড়িয়ে পড়লো অম্লানের পাশে। তার হাতে ছিল একটা নীল ছাতা, কিন্তু বাতাসের ঝাপটায় সে ভিজে একাকার।
+
+    অম্লান নিজের রুমালটা বাড়িয়ে দিয়ে বললো, "আপনি খুব ভিজে গেছেন, এটা নিন।" মেয়েটি কিছুটা ইতস্তত করে রুমালটা নিলো এবং মৃদু হেসে বললো, "ধন্যবাদ, আমি নীলা।"
+
+    সেই শুরু। এরপর থেকে প্রতিদিন ঠিক ওই সময়েই তাদের দেখা হতে লাগলো। কখনো বৃষ্টির বাহানায়, কখনো বা এক কাপ চায়ের আড্ডায়। অম্লান বুঝতে পারলো সে নীলার প্রেমে পড়ে গেছে। একদিন সে বলেই ফেললো, "নীলা, এই বৃষ্টি যেমন পৃথিবীকে সতেজ করে, তুমিও আমার জীবনটা তেমন রাঙিয়ে দিয়েছ। সারাজীবন আমার পাশে থাকবে?"
+
+    নীলা লাজুক হেসে অম্লানের হাতটা চেপে ধরলো। বৃষ্টির শব্দে তাদের হৃদস্পন্দন এক হয়ে মিশে গেল। আজও বৃষ্টি নামলে তারা সেই বাসস্ট্যান্ডের কথা মনে করে হাসে।`
+            },
+            2: {
+                title: "নীল খামের চিঠি",
+                content: `ভার্সিটির শেষ দিন আজ। অনিক অনেকদিন ধরে একটা কথা বলতে চেয়েছিল রাইসাকে, কিন্তু সাহসে কুলিয়ে উঠতে পারেনি। রাইসা ক্লাসের সবচেয়ে শান্ত মেয়ে, সবসময় বইয়ের মাঝে ডুবে থাকে।
+
+    অনিক একটা নীল খামে নীল কাগজে তার মনের সব কথা লিখে রাইসার ব্যাগে লুকিয়ে রেখে দিল। চিঠিতে লেখা ছিল, "আমি জানি না তুমি আমাকে কীভাবে দেখো, কিন্তু আমার প্রতিটা সকাল শুরু হয় তোমার কথা ভেবে আর রাত শেষ হয় তোমার ছবি দেখে। যদি পারো, আমাকে একটা সুযোগ দিও।"
+
+    কয়েকদিন কেটে গেল, রাইসার কোনো উত্তর নেই। অনিক ধরে নিল রাইসা হয়তো তাকে প্রত্যাখ্যান করেছে। মন খারাপ করে সে যখন ক্যাম্পাসের পেছনের বাগানে বসে ছিল, তখন রাইসা সামনে এসে দাঁড়ালো। তার হাতে সেই নীল খামটা।
+
+    রাইসা বললো, "চিঠিটা সুন্দর, কিন্তু একটা ভুল আছে।" অনিক ঘাবড়ে গিয়ে বললো, "কী ভুল?" 
+    রাইসা হেসে দিয়ে চিঠির উল্টো পাশ দেখালো, সেখানে লেখা ছিল— "আমিও ঠিক এটাই তোমাকে বলতে চেয়েছিলাম কিন্তু তোমার বোকামি দেখার অপেক্ষায় ছিলাম।" অনিক অবাক চোখে তাকিয়ে রইলো, তাদের চারপাশটা যেন এক মায়াবী আলোয় ভরে উঠলো।`
+            },
+            3: {
+                title: "গোধূলির শেষ ট্রেন",
+                content: `পাঁচ বছর পর শহর ছাড়ছে অরণ্য। তার চাকরি বদলেছে, তাই আজই শেষ দিন। স্টেশনে ট্রেনের জন্য অপেক্ষা করছে সে। হঠাৎ ভিড়ের মধ্যে দেখলো সেই পরিচিত মুখটি— তিশা। যার সাথে পাঁচ বছর আগে এক অভিমানী বিকেলে বিচ্ছেদ হয়েছিল।
+
+    তিশাও অরণ্যকে দেখে থমকে দাঁড়িয়ে পড়লো। দুজনের চোখে অনেক প্রশ্ন, কিন্তু মুখে কোনো শব্দ নেই। অরণ্য এগিয়ে গিয়ে বললো, "কেমন আছো?"
+    তিশা কোনোমতে উত্তর দিলো, "ভালো। তুমি চলে যাচ্ছ?"
+    অরণ্য মাথা নাড়লো। ট্রেন আসার হুইসেল শোনা যাচ্ছে। তিশার চোখ জোড়া ছলছল করে উঠলো। সে নীচু গলায় বললো, "সেদিন কি আমাদের আলাদা হওয়া খুব জরুরি ছিল?"
+
+    অরণ্য বুঝলো ভুলটা দুজনেরই ছিল। ট্রেন স্টেশনে এসে থামলো। অরণ্য ট্রেনে না উঠে তিশার হাত ধরলো। সে বললো, "ট্রেন তো আবার আসবে, কিন্তু তোমাকে হারালে আমি আর নিজেকে খুঁজে পাবো না। চলো, নতুন করে শুরু করি।"
+
+    গোধূলির আলোয় সেই স্টেশনে দাঁড়িয়ে দুজন দুজনকে নতুন করে ফিরে পেল। ট্রেনের শব্দ ছাপিয়ে তাদের হৃদয়ের নীরব আলাপন পূর্ণতা পেল।`
+            }
+        };
+
+        function readStory(id) {
+            document.getElementById('welcome-area').classList.add('hidden');
+            document.getElementById('list-area').classList.add('hidden');
+            
+            const viewer = document.getElementById('viewer-area');
+            viewer.classList.remove('hidden');
+            
+            document.getElementById('st-title').innerText = stories[id].title;
+            document.getElementById('st-content').innerText = stories[id].content;
+            
+            document.getElementById('backBtn').style.display = 'flex';
+            window.scrollTo(0,0);
+        }
+
+        function goBack() {
+            document.getElementById('welcome-area').classList.remove('hidden');
+            document.getElementById('list-area').classList.remove('hidden');
+            document.getElementById('viewer-area').classList.add('hidden');
+            document.getElementById('backBtn').style.display = 'none';
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
