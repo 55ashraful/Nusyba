@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বুড়া বেডি - কুইজ ও লাইভ লিডারবোর্ড</title>
+    <!-- Tailwind and Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Geist:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Realtime Database Support) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { inter: ['Inter', 'sans-serif'], geist: ['Geist', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+   <style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #0a0a1a; 
+        color: #fff;
+        overflow-x: hidden;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none; 
+    }
+        
+    .story-card {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.05));
+        border: 2px solid rgba(168, 85, 247, 0.2);
+        border-radius: 16px;
+        transition: all 0.3s;
+    }
+    .story-card:hover {
+        border-color: rgba(168, 85, 247, 0.5);
+        box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+    }
+
+    .grad-text {
+        background: linear-gradient(135deg, #c084fc, #f472b6, #fbbf24);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .floating-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(to right, #9333ea, #db2777);
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        z-index: 1000;
+        cursor: pointer;
+        border: none;
+        color: white;
+        font-size: 24px;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .ani-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .option-btn {
+        background: rgba(168, 85, 247, 0.1);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        transition: all 0.2s;
+    }
+    .option-btn:hover:not(:disabled) {
+        background: rgba(168, 85, 247, 0.25);
+        border-color: rgba(168, 85, 247, 0.6);
+    }
+    .correct {
+        background: rgba(34, 197, 94, 0.2) !important;
+        border-color: #22c55e !important;
+        color: #4ade80 !important;
+    }
+    .wrong {
+        background: rgba(239, 68, 68, 0.2) !important;
+        border-color: #ef4444 !important;
+        color: #f87171 !important;
+    }
+    </style>
+</head>
+<body class="selection:bg-purple-500/30">
+
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-purple-500/20" style="background:rgba(10,10,26,0.9); backdrop-filter:blur(16px)">
+        <div class="max-w-5xl mx-auto h-full px-5 flex items-center justify-between">
+            <h1 class="font-geist font-black text-2xl grad-text">বুড়া বেডি</h1>
+            <a href="index.html" class="text-xs font-bold text-purple-400 border border-purple-500/30 px-3 py-1 rounded-full hover:bg-purple-500/10 transition">Humm</a>
+        </div>
+    </nav>
+
+    <div class="container max-w-2xl mx-auto px-6 pt-28 pb-20">
+        
+        <!-- Welcome Section -->
+        <div id="welcome-area" class="text-center mb-8 ani-up">
+            <div class="text-5xl mb-4">🧠</div>
+            <p class="text-xs font-extrabold uppercase tracking-[.25em] text-purple-400 mb-2">বুড়া বেডি</p>
+            <h2 class="font-geist text-3xl font-black text-white">প্রশ্নগুলোর সঠিক উত্তর দাও</h2>
+        </div>
+
+        <!-- User Name Input Box -->
+        <div id="name-area" class="story-card p-6 mb-8 text-center ani-up">
+            <h3 class="text-lg font-bold text-purple-200 mb-3">কুইজ শুরু করার আগে আপনার নাম দিন:</h3>
+            <div class="flex gap-2 max-w-md mx-auto">
+                <input type="text" id="username-input" placeholder="আপনার নাম..." class="w-full bg-purple-950/40 border border-purple-500/30 rounded-xl px-4 py-2 text-white outline-none focus:border-purple-400 transition">
+                <button onclick="saveUsername()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-5 py-2 rounded-xl transition">সেভ</button>
+            </div>
+            <p id="user-display" class="hidden text-green-400 font-bold mt-3 text-sm"></p>
+        </div>
+
+        <!-- Category List -->
+        <div id="list-area" class="space-y-4 ani-up">
+            <div onclick="startQuiz(1)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">১. সাধারণ জ্ঞান - বাংলাদেশ ও বিশ্ব</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+            <div onclick="startQuiz(2)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">২. বিজ্ঞান ও প্রযুক্তি</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+            <div onclick="startQuiz(3)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">৩. বুদ্ধির ধাঁধা ও মজার প্রশ্ন</span>
+                <span class="text-purple-500">➔</span>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-area" class="story-card p-6 mt-10 ani-up">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-black grad-text">🏆 গ্লোবাল লাইভ লিডারবোর্ড</h3>
+                <span class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold animate-pulse">🔴 LIVE</span>
+            </div>
+            <div id="leaderboard-list" class="space-y-3">
+                <p class="text-center text-xs text-purple-400">ডাটা লোড হচ্ছে...</p>
+            </div>
+        </div>
+
+        <!-- Question Viewer Area -->
+        <div id="viewer-area" class="hidden ani-up">
+            <div class="story-card p-6 md:p-8">
+                
+                <div class="flex justify-between items-center border-b border-purple-500/20 pb-4 mb-6">
+                    <h2 id="st-title" class="font-geist text-xl font-black grad-text"></h2>
+                    <span id="q-counter" class="text-xs font-bold bg-purple-500/20 px-3 py-1 rounded-full text-purple-300"></span>
+                </div>
+
+                <div id="quiz-box">
+                    <h3 id="q-text" class="text-xl font-bold text-white mb-6 leading-relaxed"></h3>
+                    <div id="options-container" class="space-y-3"></div>
+                    
+                    <button id="nextBtn" onclick="nextQuestion()" class="hidden w-full mt-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-xl transition shadow-lg shadow-purple-500/25">
+                        পরবর্তী প্রশ্ন ➔
+                    </button>
+                </div>
+
+                <div id="score-box" class="hidden text-center py-6">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">কুইজ সম্পন্ন হয়েছে!</h3>
+                    <p id="score-text" class="text-purple-200 text-lg mb-6 leading-loose"></p>
+                    <button onclick="goBack()" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition">
+                        প্রধান পাতায় ফিরে যান
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Back Button -->
+    <button id="backBtn" onclick="goBack()" class="floating-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+    </button>
+
+    <footer class="py-10 text-center border-t border-purple-500/10">
+        <p class="font-geist text-lg font-black grad-text">ইতি মো:আশরাফুল</p>
+        <p class="text-purple-500 text-xs mt-2 font-bold uppercase tracking-widest">© ২০২৬ সর্বস্বত্ব সংরক্ষিত</p>
+    </footer>
+
+    <!-- JavaScript Code -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_ZdRV0JWPYRGn2aemLoRaLZRiFuP0adQ",
+            authDomain: "project-f3b1b.firebaseapp.com",
+            databaseURL: "https://project-f3b1b-default-rtdb.firebaseio.com",
+            projectId: "project-f3b1b",
+            storageBucket: "project-f3b1b.firebasestorage.app",
+            messagingSenderId: "320316198679",
+            appId: "1:320316198679:web:f507ccdeec5a32b87eb152",
+            measurementId: "G-KN95MY5PB3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const quizData = {
+            1: {
+                title: "সাধারণ জ্ঞান - বাংলাদেশ ও বিশ্ব",
+                questions: [
+                    { q: "বাংলাদেশের জাতীয় পাখির নাম কি?", options: ["দোয়েল", "ময়না", "কাক", "কোয়েল"], ans: 1 },
+                    { q: "বাংলাদেশের রাজধানী কোথায় অবস্থিত?", options: ["চট্টগ্রাম", "সিলেট", "ঢাকা", "খুলনা"], ans: 3 },
+                    { q: "পৃথিবীর বৃহত্তম মহাসাগরের নাম কি?", options: ["আটলান্টিক", "প্রশান্ত মহাসাগর", "ভারত মহাসাগর", "উত্তর মহাসাগর"], ans: 2 },
+                    { q: "বাংলাদেশের জাতীয় ফল কোনটি?", options: ["আম", "কাঁঠাল", "লিচু", "কলা"], ans: 2 },
+                    { q: "বাংলাদেশের স্বাধীনতা দিবস কবে?", options: ["১৬ ডিসেম্বর", "২১ ফেব্রুয়ারি", "২৬ মার্চ", "১৪ এপ্রিল"], ans: 3 },
+                    { q: "বাংলাদেশের জাতীয় খেলার নাম কি?", options: ["ক্রিকেট", "ফুটবল", "কাবাডি", "হা-ডু-ডু"], ans: 3 },
+                    { q: "বিশ্বের বৃহত্তম ম্যানগ্রোভ বন কোনটি?", options: ["আমাজন", "সুন্দরবন", "ব্ল্যাক ফরেস্ট", "টাইগা"], ans: 2 },
+                    { q: "বাংলাদেশের মুদ্রার নাম কি?", options: ["রুপি", "ডলার", "টাকা", "রিয়াল"], ans: 3 },
+                    { q: "পদ্মা সেতু কোন নদীর ওপর নির্মিত?", options: ["মেঘনা", "যমুনা", "পদ্মা", "কর্ণফুলী"], ans: 3 },
+                    { q: "বাংলাদেশের জাতীয় কবি কে?", options: ["রবীন্দ্রনাথ ঠাকুর", "কাজী নজরুল ইসলাম", "জসীম উদ্দীন", "জীবনানন্দ দাশ"], ans: 2 },
+                    { q: "পৃথিবীর বৃহত্তম মহাদেশ কোনটি?", options: ["আফ্রিকা", "ইউরোপ", "এশিয়া", "আমেরিকা"], ans: 3 },
+                    { q: "প্যারিস কোন দেশের রাজধানী?", options: ["জার্মানি", "ফ্রান্স", "ইতালি", "স্পেন"], ans: 2 },
+                    { q: "এভারেস্ট পর্বতশৃঙ্গ কোন দেশে অবস্থিত?", options: ["ভারত", "চীন", "নেপাল", "ভুটান"], ans: 3 },
+                    { q: "বাংলাদেশের বিজয় দিবস কবে?", options: ["১৬ ডিসেম্বর", "২৬ মার্চ", "২১ ফেব্রুয়ারি", "১৫ আগস্ট"], ans: 1 },
+                    { q: "আন্তর্জাতিক মাতৃভাষা দিবস কোনটি?", options: ["১৬ ডিসেম্বর", "২১ ফেব্রুয়ারি", "২৬ মার্চ", "১ মে"], ans: 2 },
+                    { q: "কাগজের উদ্ভাবক কোন দেশ?", options: ["জাপান", "চীন", "ভারত", "মিশর"], ans: 2 },
+                    { q: "পিরামিডের দেশ বলা হয় কোন দেশকে?", options: ["গ্রীস", "মিশর", "ইরান", "ইরাক"], ans: 2 },
+                    { q: "সূর্যোদয়ের দেশ বলা হয় কাকে?", options: ["নরওয়ে", "জাপান", "থাইল্যান্ড", "চীন"], ans: 2 },
+                    { q: "বিশ্বের দীর্ঘতম নদী কোনটি?", options: ["আমাজন", "নীলনদ", "মিসিসিপি", "ইয়াংসি"], ans: 2 },
+                    { q: "বাংলাদেশের জাতীয় পুষ্প কোনটি?", options: ["গোলাপ", "শাপলা", "বেলী", "জবা"], ans: 2 }
+                ]
+            },
+            2: {
+                title: "বিজ্ঞান ও প্রযুক্তি",
+                questions: [
+                    { q: "সূর্য কোন দিকে ওঠে?", options: ["পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ"], ans: 3 },
+                    { q: "মানুষের শরীরে মোট কয়টি হাড় থাকে?", options: ["২০৬ টি", "২০৫ টি", "২১০ টি", "২০০ টি"], ans: 1 },
+                    { q: "কম্পিউটারের মস্তিষ্ক কাকে বলা হয়?", options: ["র‍্যাম", "সিপিইউ (CPU)", "হিসাব বিভাগ", "মনিটর"], ans: 2 },
+                    { q: "কোন গ্যাস আমাদের শ্বাস-প্রশ্বাসে গ্রহণ করি?", options: ["কার্বন ডাই অক্সাইড", "অক্সিজেন", "নাইট্রোজেন", "হাইড্রোজেন"], ans: 2 },
+                    { q: "পানির রাসায়নিক সংকেত কি?", options: ["CO2", "O2", "H2O", "NaCl"], ans: 3 },
+                    { q: "বিদ্যুৎ আবিষ্কার করেন কে?", options: ["আইজাক নিউটন", "বেনজামিন ফ্র্যাঙ্কলিন", "থমাস এডিসন", "গ্যালিলিও"], ans: 2 },
+                    { q: "আমাদের সৌরজগতে কয়টি গ্রহ রয়েছে?", options: ["৭ টি", "৮ টি", "৯ টি", "১০ টি"], ans: 2 },
+                    { q: "সবচেয়ে দূরবর্তী গ্রহ কোনটি?", options: ["মঙ্গল", "বুধ", "নেপচুন", "বৃহস্পতি"], ans: 3 },
+                    { q: "মানবদেহের সবচেয়ে বড় অঙ্গ কোনটি?", options: ["হৃদপিণ্ড", "যকৃৎ", "ত্বক", "ফুসফুস"], ans: 3 },
+                    { q: "বাল্ব বা বাতি কে আবিষ্কার করেন?", options: ["এডওয়ার্ড জেনার", "থমাস এডিসন", "রাইট ভ্রাতৃদ্বয়", "মার্শাল"], ans: 2 },
+                    { q: "সূর্যের আলো থেকে আমরা কোন ভিটামিন পাই?", options: ["ভিটামিন A", "ভিটামিন B", "ভিটামিন C", "ভিটামিন D"], ans: 4 },
+                    { q: "পৃথিবীর নিজ অক্ষের চারপাশে ঘুরতে কত সময় লাগে?", options: ["১২ ঘণ্টা", "২৪ ঘণ্টা", "৪৮ ঘণ্টা", "৩৬৫ দিন"], ans: 2 },
+                    { q: "গাছ রাতে কোন গ্যাস ত্যাগ করে?", options: ["অক্সিজেন", "কার্বন ডাই অক্সাইড", "নাইট্রোজেন", "মিথেন"], ans: 2 },
+                    { q: "ইন্টারনেটের জনক বলা হয় কাকে?", options: ["বিল গেটস", "ভিন্ট কার্ফ", "স্টিভ জবস", "মার্শাল"], ans: 2 },
+                    { q: "মোবাইল ফোন কে আবিষ্কার করেন?", options: ["মার্টিন কুপার", "এডিসন", "বেল", "ফ্যারাডে"], ans: 1 }
+                ]
+            },
+            3: {
+                title: "বুদ্ধির ধাঁধা ও মজার প্রশ্ন",
+                questions: [
+                    { q: "এমন কি জিনিস যা কাটলে বড় হয়?", options: ["গাছ", "পুকুর/গর্ত", "কাগজ", "দড়ি"], ans: 2 },
+                    { q: "এমন কোন জিনিস যা যত টানে তত ছোট হয়?", options: ["সিগারেট", "দড়ি", "রাবার", "রড"], ans: 1 },
+                    { q: "কোন গাছে পাতা থাকে কিন্তু ডালপালা থাকে না?", options: ["আম গাছ", "কলা গাছ", "বট গাছ", "লিচু গাছ"], ans: 2 },
+                    { q: "এক চোখ আছে কিন্তু দেখতে পায় না কি?", options: ["সুই", "লাঠি", "পাথর", "সূর্য"], ans: 1 },
+                    { q: "সব সময় চলে কিন্তু কখনোই ক্লান্ত হয় না কি?", options: ["গাড়ি", "বাতাস", "ঘড়ি", "পানি"], ans: 3 },
+                    { q: "কোন ঘরে দরজা বা জানালা থাকে না?", options: ["ডিমের ভেতর", "বক্স", "কারাগার", "তাজমহল"], ans: 1 },
+                    { q: "কাঁচা থাকতে সবুজ, পাকলে লাল, রান্না করলে কালো— জিনিসটি কি?", options: ["চা পাতা", "মরিচ", "কয়লা", "টমেটো"], ans: 1 },
+                    { q: "এমন কি নদী যা শুকিয়ে গেলেও পানি থাকে না?", options: ["মানচিত্রের নদী", "মরুভূমির নদী", "আকাশের নদী", "বরফের নদী"], ans: 1 },
+                    { q: "কোন পাখি উড়তে পারে কিন্তু ডিম পাড়তে পারে না?", options: ["বাদুড়", "প্যাঁচা", "মরু পাখি", "কাক"], ans: 1 },
+                    { q: "যা আছে তোমার কাছে, কিন্তু সবাই ব্যবহার করে বেশি কোনটি?", options: ["টাকা", "নাম", "ফোন", "জামা"], ans: 2 },
+                    { q: "মাথায় চুল নেই কিন্তু চিরুনি কিনে কে?", options: ["টাক মাথার মানুষ", "দোকানদার", "পুতুল", "হাঁস"], ans: 2 },
+                    { q: "এমন কি বস্তু যা ভেঙে গেলে শব্দ হয় না?", options: ["কাঁচ", "বিশ্বাস", "প্লেট", "আয়না"], ans: 2 },
+                    { q: "যার পা নেই কিন্তু সারা পৃথিবী ঘুরে বেড়ায় কে?", options: ["চিঠি", "বাতাস", "মেঘ", "সূর্য"], ans: 1 },
+                    { q: "এমন কি জিনিস যা পানির নিচে গেলেও ভিজে না?", options: ["ছায়া", "মাছ", "নৌকা", "পাথর"], ans: 1 },
+                    { q: "জীবন্ত মানুষকে মানুষ কবর দেয় না, কিন্তু কাকে দেয়?", options: ["স্বপ্নে", "ছায়াকে", "লাশকে", "স্মৃতিকে"], ans: 3 }
+                ]
+            }
+        };
+
+        let currentQuizSet = [];
+        let currentQIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let userName = localStorage.getItem('quiz_user_name') || '';
+        let currentUserSessionId = null;
+
+        if (userName) {
+            showUserActive();
+        }
+
+        listenToLiveLeaderboard();
+
+        function saveUsername() {
+            const input = document.getElementById('username-input').value.trim();
+            if(!input) {
+                alert("দয়া করে আপনার নাম লিখুন!");
+                return;
+            }
+            userName = input;
+            localStorage.setItem('quiz_user_name', userName);
+            showUserActive();
+        }
+
+        function showUserActive() {
+            document.getElementById('username-input').classList.add('hidden');
+            document.querySelector('#name-area button').classList.add('hidden');
+            const display = document.getElementById('user-display');
+            display.innerText = `খেলোয়াড়: ${userName}`;
+            display.classList.remove('hidden');
+        }
+
+        function startQuiz(id) {
+            if(!userName) {
+                alert("কুইজ শুরু করার আগে উপরে আপনার নাম লিখে সেভ করুন!");
+                return;
+            }
+
+            currentQuizSet = quizData[id].questions;
+            currentQIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            
+            // নতুন সেশন আইডি (লাইভ ট্র্যাকিং এর জন্য)
+            currentUserSessionId = database.ref('scores').push().key;
+
+            document.getElementById('welcome-area').classList.add('hidden');
+            document.getElementById('name-area').classList.add('hidden');
+            document.getElementById('list-area').classList.add('hidden');
+            document.getElementById('leaderboard-area').classList.add('hidden');
+            
+            const viewer = document.getElementById('viewer-area');
+            viewer.classList.remove('hidden');
+            document.getElementById('st-title').innerText = quizData[id].title;
+            
+            document.getElementById('quiz-box').classList.remove('hidden');
+            document.getElementById('score-box').classList.add('hidden');
+            document.getElementById('backBtn').style.display = 'flex';
+            
+            window.scrollTo(0,0);
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = currentQuizSet[currentQIndex];
+            document.getElementById('q-counter').innerText = `প্রশ্ন ${currentQIndex + 1} / ${currentQuizSet.length}`;
+            document.getElementById('q-text').innerText = `${currentQIndex + 1}. ${q.q}`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            document.getElementById('nextBtn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl font-medium cursor-pointer transition flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span><span class="icon text-xl"></span>`;
+                btn.onclick = () => selectAnswer(idx + 1, q.ans, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedNum, correctNum, btnElement) {
+            const container = document.getElementById('options-container');
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedNum === correctNum) {
+                btnElement.classList.add('correct');
+                btnElement.querySelector('.icon').innerText = '✓';
+                correctCount++;
+            } else {
+                btnElement.classList.add('wrong');
+                btnElement.querySelector('.icon').innerText = '✕';
+                wrongCount++;
+                const correctBtn = buttons[correctNum - 1];
+                if (correctBtn) {
+                    correctBtn.classList.add('correct');
+                    correctBtn.querySelector('.icon').innerText = '✓';
+                }
+            }
+
+            // প্রতিটি উত্তরের পরেই ফায়ারবেসে ইনস্ট্যান্ট লাইভ সেভ হবে
+            saveInstantScore();
+
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < currentQuizSet.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        function showScore() {
+            document.getElementById('quiz-box').classList.add('hidden');
+            document.getElementById('score-box').classList.remove('hidden');
+            document.getElementById('score-text').innerHTML = `
+                মোট প্রশ্ন: ${currentQuizSet.length}<br>
+                <span class="text-green-400 font-bold">সঠিক উত্তর: ${correctCount} টি</span><br>
+                <span class="text-red-400 font-bold">ভুল উত্তর: ${wrongCount} টি</span>
+            `;
+
+            saveInstantScore();
+        }
+
+        // রিয়েল-টাইম ডাটাবেজে পয়েন্ট ইন্সট্যান্ট সেভ ফাংশন
+        function saveInstantScore() {
+            if(!currentUserSessionId) return;
+
+            const currentTime = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+            
+            database.ref('scores/' + currentUserSessionId).set({
+                name: userName,
+                correct: correctCount,
+                wrong: wrongCount,
+                time: currentTime,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        function listenToLiveLeaderboard() {
+            database.ref('scores').orderByChild('timestamp').limitToLast(15).on('value', (snapshot) => {
+                const container = document.getElementById('leaderboard-list');
+                container.innerHTML = '';
+                
+                const scores = [];
+                snapshot.forEach((childSnap) => {
+                    scores.unshift(childSnap.val());
+                });
+
+                if (scores.length > 0) {
+                    scores.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-between items-center bg-purple-950/30 border border-purple-500/20 p-3 rounded-xl text-sm ani-up';
+                        div.innerHTML = `
+                            <div>
+                                <span class="font-bold text-white">${item.name}</span>
+                                <span class="text-xs text-purple-400 block">সময়: ${item.time || ''}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-green-400 font-bold">✓ ${item.correct}</span> | 
+                                <span class="text-red-400 font-bold">✕ ${item.wrong}</span>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-center text-xs text-purple-400">এখনো কোনো ফলাফল পাওয়া যায়নি</p>';
+                }
+            });
+        }
+
+        function goBack() {
+            document.getElementById('welcome-area').classList.remove('hidden');
+            document.getElementById('name-area').classList.remove('hidden');
+            document.getElementById('list-area').classList.remove('hidden');
+            document.getElementById('leaderboard-area').classList.remove('hidden');
+            document.getElementById('viewer-area').classList.add('hidden');
+            document.getElementById('backBtn').style.display = 'none';
+            window.scrollTo(0,0);
+        }
+
+        // সিকিউরিটি বন্ধ
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && ['c', 'u', 's', 'a', 'i'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
