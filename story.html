@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Geist:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDK (Realtime Database Support) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -138,15 +138,15 @@
         <!-- Category List -->
         <div id="list-area" class="space-y-4 ani-up">
             <div onclick="startQuiz(1)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
-                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">১. সাধারণ জ্ঞান - বাংলাদেশ ও বিশ্ব</span>
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">১. বিজ্ঞান ও প্রযুক্তি</span>
                 <span class="text-purple-500">➔</span>
             </div>
             <div onclick="startQuiz(2)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
-                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">২. বিজ্ঞান ও প্রযুক্তি</span>
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">২. বুদ্ধির ধাঁধা ও মজার প্রশ্ন</span>
                 <span class="text-purple-500">➔</span>
             </div>
             <div onclick="startQuiz(3)" class="story-card p-6 cursor-pointer flex justify-between items-center group">
-                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">৩. বুদ্ধির ধাঁধা ও মজার প্রশ্ন</span>
+                <span class="text-lg font-bold text-purple-200 group-hover:text-white transition">৩. বীজগণিত সাধারণ প্রশ্ন</span>
                 <span class="text-purple-500">➔</span>
             </div>
         </div>
@@ -224,51 +224,26 @@
 
         const quizData = {
             1: {
-                title: "সাধারণ জ্ঞান - বাংলাদেশ ও বিশ্ব",
+                title: "বিজ্ঞান ও প্রযুক্তি (এডভান্সড মেডিকেল)",
                 questions: [
-                    { q: "বাংলাদেশের জাতীয় পাখির নাম কি?", options: ["দোয়েল", "ময়না", "কাক", "কোয়েল"], ans: 1 },
-                    { q: "বাংলাদেশের রাজধানী কোথায় অবস্থিত?", options: ["চট্টগ্রাম", "সিলেট", "ঢাকা", "খুলনা"], ans: 3 },
-                    { q: "পৃথিবীর বৃহত্তম মহাসাগরের নাম কি?", options: ["আটলান্টিক", "প্রশান্ত মহাসাগর", "ভারত মহাসাগর", "উত্তর মহাসাগর"], ans: 2 },
-                    { q: "বাংলাদেশের জাতীয় ফল কোনটি?", options: ["আম", "কাঁঠাল", "লিচু", "কলা"], ans: 2 },
-                    { q: "বাংলাদেশের স্বাধীনতা দিবস কবে?", options: ["১৬ ডিসেম্বর", "২১ ফেব্রুয়ারি", "২৬ মার্চ", "১৪ এপ্রিল"], ans: 3 },
-                    { q: "বাংলাদেশের জাতীয় খেলার নাম কি?", options: ["ক্রিকেট", "ফুটবল", "কাবাডি", "হা-ডু-ডু"], ans: 3 },
-                    { q: "বিশ্বের বৃহত্তম ম্যানগ্রোভ বন কোনটি?", options: ["আমাজন", "সুন্দরবন", "ব্ল্যাক ফরেস্ট", "টাইগা"], ans: 2 },
-                    { q: "বাংলাদেশের মুদ্রার নাম কি?", options: ["রুপি", "ডলার", "টাকা", "রিয়াল"], ans: 3 },
-                    { q: "পদ্মা সেতু কোন নদীর ওপর নির্মিত?", options: ["মেঘনা", "যমুনা", "পদ্মা", "কর্ণফুলী"], ans: 3 },
-                    { q: "বাংলাদেশের জাতীয় কবি কে?", options: ["রবীন্দ্রনাথ ঠাকুর", "কাজী নজরুল ইসলাম", "জসীম উদ্দীন", "জীবনানন্দ দাশ"], ans: 2 },
-                    { q: "পৃথিবীর বৃহত্তম মহাদেশ কোনটি?", options: ["আফ্রিকা", "ইউরোপ", "এশিয়া", "আমেরিকা"], ans: 3 },
-                    { q: "প্যারিস কোন দেশের রাজধানী?", options: ["জার্মানি", "ফ্রান্স", "ইতালি", "স্পেন"], ans: 2 },
-                    { q: "এভারেস্ট পর্বতশৃঙ্গ কোন দেশে অবস্থিত?", options: ["ভারত", "চীন", "নেপাল", "ভুটান"], ans: 3 },
-                    { q: "বাংলাদেশের বিজয় দিবস কবে?", options: ["১৬ ডিসেম্বর", "২৬ মার্চ", "২১ ফেব্রুয়ারি", "১৫ আগস্ট"], ans: 1 },
-                    { q: "আন্তর্জাতিক মাতৃভাষা দিবস কোনটি?", options: ["১৬ ডিসেম্বর", "২১ ফেব্রুয়ারি", "২৬ মার্চ", "১ মে"], ans: 2 },
-                    { q: "কাগজের উদ্ভাবক কোন দেশ?", options: ["জাপান", "চীন", "ভারত", "মিশর"], ans: 2 },
-                    { q: "পিরামিডের দেশ বলা হয় কোন দেশকে?", options: ["গ্রীস", "মিশর", "ইরান", "ইরাক"], ans: 2 },
-                    { q: "সূর্যোদয়ের দেশ বলা হয় কাকে?", options: ["নরওয়ে", "জাপান", "থাইল্যান্ড", "চীন"], ans: 2 },
-                    { q: "বিশ্বের দীর্ঘতম নদী কোনটি?", options: ["আমাজন", "নীলনদ", "মিসিসিপি", "ইয়াংসি"], ans: 2 },
-                    { q: "বাংলাদেশের জাতীয় পুষ্প কোনটি?", options: ["গোলাপ", "শাপলা", "বেলী", "জবা"], ans: 2 }
+                    { q: "কার্ডিয়াক মায়োসাইটে অ্যাকশন পটেনশিয়ালের ফেজ-২ (Plateau Phase) বজায় রাখতে কোন ক্যাটায়নের প্রবাহ প্রধান ভূমিকা পালন করে?", options: ["L-type Ca²⁺ চ্যানেলের মাধ্যমে Ca²⁺ ভেতরে প্রবেশ", "Na⁺ চ্যানেল থেকে Na⁺ ভেতরের প্রবাহ", "K⁺ চ্যানেলের মাধ্যমে K⁺ এর বহির্গমন", "Na⁺-K⁺ ATPase পাম্প"], ans: 1 },
+                    { q: "কোন এনজাইমের মিউটেশন লি-ফ্রাউমেনি সিন্ড্রোম (Li-Fraumeni Syndrome)-এর জন্য দায়ী যা টিউমার সাপ্রেসর হিসেবে কাজ করে?", options: ["BRCA1", "TP53", "RB1", "APC"], ans: 2 },
+                    { q: "কোষের অটোফেজি (Autophagy) প্রক্রিয়ায় অটোলিসোজোম গঠনে কোন প্রোটিন কমপ্লেক্সটি প্রধান ভূমিকা রাখে?", options: ["LC3-II এবং Atg12-Atg5-Atg16L1", "Caspase-3 এবং Caspase-9", "Cyclin D1 এবং CDK4", "ubiquitin-ligase E3"], ans: 1 },
+                    { q: "মস্তিষ্কের সেরিব্রোস্পাইনাল ফ্লুইড (CSF) উৎপন্নকারী কোরয়েড প্লেক্সাসে কোন ধরনের কোষ আবৃত থাকে?", options: ["অ্যাস্ট্রোসাইট", "অলিগোডেনড্রোসাইট", "এপেনডাইমাল কোষ", "মাইক্রোগ্লিয়া"], ans: 3 },
+                    { q: "কোন অ্যান্টিবায়োটিক ব্যাকটেরিয়া প্রোটিন সংশ্লেষণের সময় 50S রাইবোসোমাল সাবইউনিটে আবদ্ধ হয়ে পেপটাইডিল ট্রান্সফারেজ ব্লক করে?", options: ["ট্রেট্রাসাইক্লিন", "ক্লোরামফেনিকল", "স্ট্রেপ্টোমাইসিন", "সিপ্রোফ্লক্সাসিন"], ans: 2 },
+                    { q: "হৃৎপিণ্ডের সাইনোঅ্যাট্রিয়াল (SA) নোডের অটোমেটিসিটির জন্য দায়ী 'Funny Current' (I_f) মূলত কোন ক্যাটায়ন দ্বারা পরিচালিত হয়?", options: ["Na⁺ ও K⁺", "Ca²⁺ ও Mg²⁺", "শুধু Ca²⁺", "শুধু K⁺"], ans: 1 },
+                    { q: "কিডনির হেনলির লুপের মোটা উর্ধ্বগামী বাহুতে (TAL) কাজ করে Na⁺-K⁺-2Cl⁻ (NKCC2) কো-ট্রান্সপোর্টার ইনহিবিটকারী ওষুধ কোনটি?", options: ["ফুরোসেমাইড (Furosemide)", "হাইড্রোক্লোরোথায়াজাইড", "স্পাইরোনোল্যাকটোন", "অ্যাসিটাজোলামাইড"], ans: 1 },
+                    { q: "পারকিনসন্স রোগে মস্তিষ্কের কোন নির্দিষ্ট অঞ্চলে ডোপামিনার্জিক নিউরনের ক্ষয় ঘটে?", options: ["সুবেপেনডাইমাল অঞ্চল", "সাবস্ট্যানশিয়া নাইগ্রা পার্স কম্প্যাক্টা", "লোকাস সেরুলিয়াস", "গ্লোবাস প্যালিডাস"], ans: 2 },
+                    { q: "ক্লোস্ট্রিডিয়াম বোটুলিনাম টক্সিন কীভাবে নিউরোমাসকুলার জংশনে অ্যাসাইটাইলকোলিন ক্ষরণ বন্ধ করে?", options: ["SNARE প্রোটিন ক্লিভ (Cleave) করে", "Na⁺ চ্যানেল ব্লক করে", "AChE এনজাইম সক্রিয় করে", "Ca²⁺ চ্যানেল স্থায়ীভাবে বন্ধ করে"], ans: 1 },
+                    { q: "নিউক্লিওসাইড এনালগ যা রিভার্স ট্রান্সক্রিপ্টেজ এনজাইম ইনহিবিট করে HIV চিকিৎসায় ব্যবহৃত হয়, সেটি কোনটি?", options: ["জিডোভুডিন (AZT)", "অ্যাসাইক্লোভির", "ওসেলটামিভির", "রিবাভিরিন"], ans: 1 },
+                    { q: "ক্লিনিক্যাল প্যাথলজিতে প্রসিটিক বাভালভিক ডিজিজ ও রেটিনোপ্যাথির সাথে অ্যালপোর্ট সিন্ড্রোমে কোন কোলাজেনের মিউটেশন ঘটে?", options: ["টাইপ I কোলাজেন", "টাইপ II কোলাজেন", "টাইপ IV কোলাজেন", "টাইপ VII কোলাজেন"], ans: 3 },
+                    { q: "ম্যালিক এনজাইম সাইট্রিক এসিড চক্রের বাইরে ম্যালের রূপান্তর ঘটিয়ে কোন এনজাইমীয় প্রোডাক্ট তৈরি করে?", options: ["পাইরুভেট ও NADPH", "অক্সালোঅ্যাসিটেট ও NADH", "অ্যাসিটাইল CoA", "সুসিনিক এসিড"], ans: 1 },
+                    { q: "কোয়ান্টাম বায়োলজিতে ফটোসিন্থেটিক প্রতিক্রিয়া কেন্দ্রে আলোক শক্তির স্থানান্তর প্রক্রিয়াটি কী নামে পরিচিত?", options: ["Förster Resonance Energy Transfer (FRET)", "FMO Quantum Coherence", "Grotthuss Mechanism", "Electron Tunnelling Effect"], ans: 2 },
+                    { q: "জেনেটিক ইপ্রিন্টিং (Genetic Imprinting)-এর সময় অ্যালিলিক জিন সাইলেন্সিং-এর প্রধান মেকানিজম কোনটি?", options: ["ডিএনএ মিথাইলেশন (DNA Methylation)", "হিস্টোন ডি-অ্যাসিটিলেশন", "আরএনএ ইন্টারফারেন্স (RNAi)", "জিন নোকাউট"], ans: 1 },
+                    { q: "সেলুলার অ্যাপোপটোসিস প্রক্রিয়ায় সাইটোক্রোম-সি (Cytochrome c) মাইটোকন্ড্রিয়া থেকে নির্গত হয়ে কার সাথে যুক্ত হয়ে অ্যাপোপটোসোম গঠন করে?", options: ["Apaf-1 ও Procaspase-9", "Bcl-2 ও Bax", "FADD ও Caspase-8", "p53 ও MDM2"], ans: 1 }
                 ]
             },
             2: {
-                title: "বিজ্ঞান ও প্রযুক্তি",
-                questions: [
-                    { q: "সূর্য কোন দিকে ওঠে?", options: ["পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ"], ans: 3 },
-                    { q: "মানুষের শরীরে মোট কয়টি হাড় থাকে?", options: ["২০৬ টি", "২০৫ টি", "২১০ টি", "২০০ টি"], ans: 1 },
-                    { q: "কম্পিউটারের মস্তিষ্ক কাকে বলা হয়?", options: ["র‍্যাম", "সিপিইউ (CPU)", "হিসাব বিভাগ", "মনিটর"], ans: 2 },
-                    { q: "কোন গ্যাস আমাদের শ্বাস-প্রশ্বাসে গ্রহণ করি?", options: ["কার্বন ডাই অক্সাইড", "অক্সিজেন", "নাইট্রোজেন", "হাইড্রোজেন"], ans: 2 },
-                    { q: "পানির রাসায়নিক সংকেত কি?", options: ["CO2", "O2", "H2O", "NaCl"], ans: 3 },
-                    { q: "বিদ্যুৎ আবিষ্কার করেন কে?", options: ["আইজাক নিউটন", "বেনজামিন ফ্র্যাঙ্কলিন", "থমাস এডিসন", "গ্যালিলিও"], ans: 2 },
-                    { q: "আমাদের সৌরজগতে কয়টি গ্রহ রয়েছে?", options: ["৭ টি", "৮ টি", "৯ টি", "১০ টি"], ans: 2 },
-                    { q: "সবচেয়ে দূরবর্তী গ্রহ কোনটি?", options: ["মঙ্গল", "বুধ", "নেপচুন", "বৃহস্পতি"], ans: 3 },
-                    { q: "মানবদেহের সবচেয়ে বড় অঙ্গ কোনটি?", options: ["হৃদপিণ্ড", "যকৃৎ", "ত্বক", "ফুসফুস"], ans: 3 },
-                    { q: "বাল্ব বা বাতি কে আবিষ্কার করেন?", options: ["এডওয়ার্ড জেনার", "থমাস এডিসন", "রাইট ভ্রাতৃদ্বয়", "মার্শাল"], ans: 2 },
-                    { q: "সূর্যের আলো থেকে আমরা কোন ভিটামিন পাই?", options: ["ভিটামিন A", "ভিটামিন B", "ভিটামিন C", "ভিটামিন D"], ans: 4 },
-                    { q: "পৃথিবীর নিজ অক্ষের চারপাশে ঘুরতে কত সময় লাগে?", options: ["১২ ঘণ্টা", "২৪ ঘণ্টা", "৪৮ ঘণ্টা", "৩৬৫ দিন"], ans: 2 },
-                    { q: "গাছ রাতে কোন গ্যাস ত্যাগ করে?", options: ["অক্সিজেন", "কার্বন ডাই অক্সাইড", "নাইট্রোজেন", "মিথেন"], ans: 2 },
-                    { q: "ইন্টারনেটের জনক বলা হয় কাকে?", options: ["বিল গেটস", "ভিন্ট কার্ফ", "স্টিভ জবস", "মার্শাল"], ans: 2 },
-                    { q: "মোবাইল ফোন কে আবিষ্কার করেন?", options: ["মার্টিন কুপার", "এডিসন", "বেল", "ফ্যারাডে"], ans: 1 }
-                ]
-            },
-            3: {
                 title: "বুদ্ধির ধাঁধা ও মজার প্রশ্ন",
                 questions: [
                     { q: "এমন কি জিনিস যা কাটলে বড় হয়?", options: ["গাছ", "পুকুর/গর্ত", "কাগজ", "দড়ি"], ans: 2 },
@@ -287,10 +262,31 @@
                     { q: "এমন কি জিনিস যা পানির নিচে গেলেও ভিজে না?", options: ["ছায়া", "মাছ", "নৌকা", "পাথর"], ans: 1 },
                     { q: "জীবন্ত মানুষকে মানুষ কবর দেয় না, কিন্তু কাকে দেয়?", options: ["স্বপ্নে", "ছায়াকে", "লাশকে", "স্মৃতিকে"], ans: 3 }
                 ]
+            },
+            3: {
+                title: "বীজগণিত (সাইন্স ও কঠিন প্রশ্ন)",
+                questions: [
+                    { q: "যদি x + 1/x = 2 হয়, তবে x³ + 1/x³ এর মান কত?", options: ["0", "1", "2", "4"], ans: 3 },
+                    { q: "ax² + bx + c = 0 সমীকরণের মূলদ্বয় সমান হওয়ার শর্ত কোনটি?", options: ["b² - 4ac > 0", "b² - 4ac = 0", "b² - 4ac < 0", "b = 0"], ans: 2 },
+                    { q: "যদি a + b = 5 এবং ab = 6 হয়, তবে a² + b² এর মান কত?", options: ["13", "19", "25", "37"], ans: 1 },
+                    { q: "দ্বিপদী সম্প্রসারণে (x + y)ⁿ এর মোট পদের সংখ্যা কতটি?", options: ["n", "n - 1", "n + 1", "2n"], ans: 3 },
+                    { q: "logₐ 1 এর মান সবসময় কত হয়?", options: ["0", "1", "a", "অসংজ্ঞায়িত"], ans: 1 },
+                    { q: "যদি 2ˣ = 16 হয়, তবে x এর মান কত?", options: ["2", "3", "4", "8"], ans: 3 },
+                    { q: "x² - 5x + 6 = 0 দ্বিঘাত সমীকরণের উৎপাদকদ্বয় কি কি?", options: ["(x-1)(x-6)", "(x-2)(x-3)", "(x+2)(x+3)", "(x-2)(x+3)"], ans: 2 },
+                    { q: "যদি f(x) = x³ - 2x + 1 হয়, তবে f(-1) এর মান কত?", options: ["0", "2", "-2", "4"], ans: 2 },
+                    { q: "a³ - b³ এর উৎপাদকের সঠিক সূত্র কোনটি?", options: ["(a-b)(a²+ab+b²)", "(a-b)(a²-ab+b²)", "(a+b)(a²-ab+b²)", "(a-b)³"], ans: 1 },
+                    { q: "যেকোনো অশূন্য সংখ্যা x এর জন্য x⁰ এর মান কত?", options: ["0", "1", "x", "অসীম"], ans: 2 },
+                    { q: "যদি log₂ x = 5 হয়, তবে x এর মান কত?", options: ["10", "25", "32", "64"], ans: 3 },
+                    { q: "কোনো গুণোত্তর ধারার প্রথম পদ a এবং সাধারণ অনুপাত r হলে, n-তম পদ কোনটি?", options: ["arⁿ", "arⁿ⁻¹", "a(r-1)ⁿ", "arⁿ⁺¹"], ans: 2 },
+                    { q: "যদি x - 1/x = 3 হয়, তবে x² + 1/x² এর মান কত?", options: ["7", "9", "11", "13"], ans: 3 },
+                    { q: "(a + b + c)² এর সঠিক সম্প্রসারণ সূত্র কোনটি?", options: ["a²+b²+c²+2ab+2bc+2ca", "a²+b²+c²-2ab-2bc-2ca", "a²+b²+c²+ab+bc+ca", "(a+b)²+c²"], ans: 1 },
+                    { q: "x² + y² = 25 এবং x = 3 হলে, y এর ধনাত্মক মান কত?", options: ["2", "3", "4", "5"], ans: 3 }
+                ]
             }
         };
 
         let currentQuizSet = [];
+        let currentCategoryTitle = "";
         let currentQIndex = 0;
         let correctCount = 0;
         let wrongCount = 0;
@@ -329,11 +325,11 @@
             }
 
             currentQuizSet = quizData[id].questions;
+            currentCategoryTitle = quizData[id].title;
             currentQIndex = 0;
             correctCount = 0;
             wrongCount = 0;
             
-            // নতুন সেশন আইডি (লাইভ ট্র্যাকিং এর জন্য)
             currentUserSessionId = database.ref('scores').push().key;
 
             document.getElementById('welcome-area').classList.add('hidden');
@@ -343,7 +339,7 @@
             
             const viewer = document.getElementById('viewer-area');
             viewer.classList.remove('hidden');
-            document.getElementById('st-title').innerText = quizData[id].title;
+            document.getElementById('st-title').innerText = currentCategoryTitle;
             
             document.getElementById('quiz-box').classList.remove('hidden');
             document.getElementById('score-box').classList.add('hidden');
@@ -391,7 +387,6 @@
                 }
             }
 
-            // প্রতিটি উত্তরের পরেই ফায়ারবেসে ইনস্ট্যান্ট লাইভ সেভ হবে
             saveInstantScore();
 
             document.getElementById('nextBtn').classList.remove('hidden');
@@ -410,6 +405,7 @@
             document.getElementById('quiz-box').classList.add('hidden');
             document.getElementById('score-box').classList.remove('hidden');
             document.getElementById('score-text').innerHTML = `
+                বিষয়: ${currentCategoryTitle}<br>
                 মোট প্রশ্ন: ${currentQuizSet.length}<br>
                 <span class="text-green-400 font-bold">সঠিক উত্তর: ${correctCount} টি</span><br>
                 <span class="text-red-400 font-bold">ভুল উত্তর: ${wrongCount} টি</span>
@@ -418,7 +414,6 @@
             saveInstantScore();
         }
 
-        // রিয়েল-টাইম ডাটাবেজে পয়েন্ট ইন্সট্যান্ট সেভ ফাংশন
         function saveInstantScore() {
             if(!currentUserSessionId) return;
 
@@ -426,6 +421,7 @@
             
             database.ref('scores/' + currentUserSessionId).set({
                 name: userName,
+                category: currentCategoryTitle,
                 correct: correctCount,
                 wrong: wrongCount,
                 time: currentTime,
@@ -449,8 +445,9 @@
                         div.className = 'flex justify-between items-center bg-purple-950/30 border border-purple-500/20 p-3 rounded-xl text-sm ani-up';
                         div.innerHTML = `
                             <div>
-                                <span class="font-bold text-white">${item.name}</span>
-                                <span class="text-xs text-purple-400 block">সময়: ${item.time || ''}</span>
+                                <span class="font-bold text-white block">${item.name}</span>
+                                <span class="text-[11px] text-pink-400 font-semibold block">${item.category || 'সাধারণ কুইজ'}</span>
+                                <span class="text-[10px] text-purple-400 block">সময়: ${item.time || ''}</span>
                             </div>
                             <div class="text-right">
                                 <span class="text-green-400 font-bold">✓ ${item.correct}</span> | 
@@ -475,7 +472,6 @@
             window.scrollTo(0,0);
         }
 
-        // সিকিউরিটি বন্ধ
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
             if (e.ctrlKey && ['c', 'u', 's', 'a', 'i'].includes(e.key.toLowerCase())) {
