@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madam Eita Tomar Jonno</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        /* চার কোনায় ভাসমান লাভ বাটনের কমন স্টাইল */
+        .corner-heart-btn {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 0, 85, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1.5px solid #ff0055;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 22px;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
+            z-index: 100;
+            animation: pulseCorner 2s infinite alternate ease-in-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .corner-heart-btn:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px #ff0055, 0 0 10px #ffffff;
+            background: rgba(255, 0, 85, 0.35);
+        }
+
+        /* চার কোনায় পজিশনিং */
+        .top-left { top: 20px; left: 20px; }
+        .top-right { top: 20px; right: 20px; }
+        .bottom-left { bottom: 20px; left: 20px; }
+        .bottom-right { bottom: 20px; right: 20px; }
+
+        @keyframes pulseCorner {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 10px #ff0055;
+            }
+            100% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px #ff0055, 0 0 10px #ff00ff;
+            }
+        }
+
+        .glowing-text {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            color: #ffffff;
+            animation: textGlow 4s infinite alternate ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055, 0 0 30px #ff0055; }
+            33% { text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff, 0 0 30px #00e5ff; }
+            66% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; }
+            100% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- চার কোনায় ৪টি ভাসমান লাভ বাটন -->
+    <a href="index.html" class="corner-heart-btn top-left" title="হোম পেজে যান">♥️</a>
+    <a href="index.html" class="corner-heart-btn top-right" title="হোম পেজে যান">♥️</a>
+    <a href="index.html" class="corner-heart-btn bottom-left" title="হোম পেজে যান">♥️</a>
+    <a href="index.html" class="corner-heart-btn bottom-right" title="হোম পেজে যান">♥️</a>
+
+    <div class="glowing-text">
+        ম্যাডাম এটা<br>তোমার জন্য
+    </div>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        const canvasSize = Math.min(screenWidth, screenHeight * 0.55);
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+
+        const centerX = canvasSize / 2;
+        const centerY = canvasSize / 2 - 10;
+
+        const colors = [
+            "#ff0055", "#ff00ff",
+            "#7a00ff", "#00e5ff",
+            "#00ff88", "#ffe600",
+            "#ff6600", "#ffffff"
+        ];
+
+        const totalLines = 120;
+        const scale = canvasSize / 38;
+
+        const lineColors = [];
+        for (let i = 0; i < totalLines; i++) {
+            lineColors.push(colors[Math.floor(Math.random() * colors.length)]);
+        }
+
+        let progress = 0;
+        const particles = [];
+
+        function easeOutQuad(t) {
+            return t * (2 - t);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+            const easeProgress = easeOutQuad(progress);
+            const edgePoints = [];
+
+            for (let i = 0; i < totalLines; i++) {
+                const angle = i * (Math.PI * 2) / totalLines;
+                const heartX = 16 * Math.pow(Math.sin(angle), 3);
+                const heartY = 13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle);
+
+                const finalX = centerX + heartX * scale;
+                const finalY = centerY - heartY * scale;
+
+                const startX = centerX;
+                const startY = centerY + (i < totalLines / 2 ? -scale * 12 : scale * 12);
+
+                const currentTargetX = startX + (finalX - startX) * easeProgress;
+                const currentTargetY = startY + (finalY - startY) * easeProgress;
+
+                const color = lineColors[i];
+
+                edgePoints.push({ x: currentTargetX, y: currentTargetY, color: color });
+
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = color;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(currentTargetX, currentTargetY);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(currentTargetX, currentTargetY);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+
+                for (let j = 0; j < 8; j++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(4, 0);
+                    ctx.stroke();
+                    ctx.rotate((45 * Math.PI) / 180);
+                }
+                
+                ctx.restore();
+            }
+
+            if (progress >= 1) {
+                for (let k = 0; k < 3; k++) {
+                    const randomPoint = edgePoints[Math.floor(Math.random() * edgePoints.length)];
+                    const dx = randomPoint.x - centerX;
+                    const dy = randomPoint.y - centerY;
+                    const angle = Math.atan2(dy, dx);
+
+                    particles.push({
+                        x: randomPoint.x,
+                        y: randomPoint.y,
+                        vx: Math.cos(angle) * (1 + Math.random() * 2),
+                        vy: Math.sin(angle) * (1 + Math.random() * 2),
+                        color: randomPoint.color,
+                        size: 2 + Math.random() * 2,
+                        alpha: 1
+                    });
+                }
+
+                for (let p = particles.length - 1; p >= 0; p--) {
+                    const pt = particles[p];
+                    pt.x += pt.vx;
+                    pt.y += pt.vy;
+                    pt.alpha -= 0.02;
+
+                    if (pt.alpha <= 0) {
+                        particles.splice(p, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = pt.alpha;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = pt.color;
+                    ctx.fillStyle = pt.color;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            if (progress < 1) {
+                progress += 0.02;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
